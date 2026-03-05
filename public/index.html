@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inbound Sales Call Scorecard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #f0f2f5;
+    color: #2d2d2d;
+    padding: 20px;
+  }
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    overflow: hidden;
+  }
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #fff;
+    padding: 28px 32px 22px;
+    text-align: center;
+  }
+  .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
+  .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
+  .red-line { height: 4px; background: linear-gradient(90deg, #c0392b, #e74c3c); }
+  .form-body { padding: 24px 32px 16px; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .info-grid .full-width { grid-column: 1 / -1; }
+  .field-group label {
+    display: block; font-size: 11px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 5px;
+  }
+  .field-group input, .field-group textarea {
+    width: 100%; padding: 10px 12px;
+    border: 1.5px solid #e0e0e0; border-radius: 8px;
+    font-size: 14px; transition: border-color 0.2s; font-family: inherit;
+  }
+  .field-group input:focus, .field-group textarea:focus {
+    outline: none; border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+  }
+
+  .section-header {
+    font-size: 15px; font-weight: 700; margin: 20px 0 10px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-header .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .dot-green { background: #27ae60; }
+  .dot-red { background: #c0392b; }
+
+  .checklist { list-style: none; }
+  .checklist li {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-radius: 8px; margin-bottom: 4px; transition: background 0.15s;
+  }
+  .checklist li:nth-child(odd) { background: #f8f9fa; }
+  .checklist li:hover { background: #eef5fd; }
+  .checklist li .item-label { font-size: 14px; flex: 1; }
+  .check-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .check-btn {
+    width: 36px; height: 36px; border: 2px solid #ddd; border-radius: 8px;
+    background: #fff; cursor: pointer; font-size: 18px;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s; color: #ccc;
+  }
+  .check-btn:hover { border-color: #aaa; }
+  .check-btn.yes.active { background: #27ae60; border-color: #27ae60; color: #fff; }
+  .check-btn.no.active { background: #e74c3c; border-color: #e74c3c; color: #fff; }
+  .check-btn.flag { width: auto; padding: 0 12px; font-size: 13px; }
+  .check-btn.flag.active { background: #e74c3c; border-color: #e74c3c; color: #fff; }
+
+  .notes-area { width: 100%; min-height: 80px; resize: vertical; }
+
+  .actions { padding: 20px 32px 28px; display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn {
+    padding: 12px 24px; border: none; border-radius: 8px;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: #27ae60; color: #fff; flex: 1; justify-content: center; font-size: 15px; }
+  .btn-primary:hover { background: #219a52; }
+  .btn-secondary { background: #f0f2f5; color: #555; }
+  .btn-secondary:hover { background: #e2e5ea; }
+  .btn-pdf { background: #2c3e50; color: #fff; }
+  .btn-pdf:hover { background: #1a252f; }
+
+  .toast {
+    position: fixed; bottom: 30px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #2d2d2d; color: #fff; padding: 12px 24px;
+    border-radius: 8px; font-size: 14px; transition: transform 0.3s ease; z-index: 100;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  .bcc-reminder {
+    background: #edf7ed; border: 1px solid #27ae60; border-radius: 8px;
+    padding: 12px 16px; margin: 0 32px 8px; font-size: 12px; color: #2d2d2d; line-height: 1.5;
+  }
+  .bcc-reminder strong { color: #27ae60; }
+
+  .step-indicator {
+    background: #f8f9fa; border-radius: 8px; padding: 14px 16px;
+    margin: 0 32px 12px; font-size: 13px; line-height: 1.6; color: #555;
+    border-left: 4px solid #27ae60;
+  }
+  .step-indicator .step { margin-bottom: 4px; }
+  .step-indicator .step b { color: #2d2d2d; }
+
+  @media (max-width: 600px) {
+    body { padding: 10px; }
+    .form-body, .actions, .bcc-reminder, .step-indicator { padding-left: 16px; padding-right: 16px; }
+    .info-grid { grid-template-columns: 1fr; }
+    .header h1 { font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Inbound Sales Call</h1>
+    <div class="subtitle">Anderson Automotive Group &bull; Call Scorecard</div>
+  </div>
+  <div class="red-line"></div>
+
+  <div class="form-body">
+    <div class="info-grid">
+      <div class="field-group">
+        <label>Rep Name</label>
+        <input type="text" id="rep_name" placeholder="Who took the call?">
+      </div>
+      <div class="field-group">
+        <label>Customer Phone</label>
+        <input type="tel" id="customer_phone" placeholder="(555) 555-5555">
+      </div>
+      <div class="field-group full-width">
+        <label>CarWars Call Link</label>
+        <input type="url" id="carwars_link" placeholder="Paste the CarWars URL here">
+      </div>
+      <div class="field-group">
+        <label>Date</label>
+        <input type="date" id="call_date">
+      </div>
+      <div class="field-group">
+        <label>Reviewed By</label>
+        <input type="text" id="reviewer" placeholder="Your name">
+      </div>
+    </div>
+
+    <div class="section-header"><span class="dot dot-green"></span> Did we:</div>
+    <ul class="checklist" id="did-we-list">
+      <li data-item="Positive Greeting"><span class="item-label">Positive Greeting</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
+      <li data-item="Engage with ?s"><span class="item-label">Engage with ?s</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
+      <li data-item="Get Their Info"><span class="item-label">Get Their Info</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
+      <li data-item="Create Flexibility"><span class="item-label">Create Flexibility</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
+      <li data-item="Answer Customer Questions"><span class="item-label">Answer Customer Questions</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
+      <li data-item="Hook the Trade"><span class="item-label">Hook the Trade</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
+      <li data-item="Appointment Ask"><span class="item-label">Appointment Ask</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
+    </ul>
+
+    <div class="section-header"><span class="dot dot-red"></span> We did not:</div>
+    <ul class="checklist" id="did-not-list">
+      <li data-item="Reply right off that the car is sold"><span class="item-label">Reply right off that the car is sold</span><div class="check-btns"><button class="check-btn flag" onclick="toggle(this,'flag')">Flagged</button></div></li>
+      <li data-item="Tell them we'll check on it and call back"><span class="item-label">Tell them we'll check on it and call back</span><div class="check-btns"><button class="check-btn flag" onclick="toggle(this,'flag')">Flagged</button></div></li>
+      <li data-item="Tell them it's at another store"><span class="item-label">Tell them it's at another store</span><div class="check-btns"><button class="check-btn flag" onclick="toggle(this,'flag')">Flagged</button></div></li>
+    </ul>
+
+    <div class="section-header" style="margin-top:20px;">Notes / Coaching Points</div>
+    <div class="field-group" style="margin-top:8px;">
+      <textarea class="notes-area" id="notes" placeholder="Add any coaching notes or observations here..."></textarea>
+    </div>
+  </div>
+
+  <div class="step-indicator">
+    <div class="step"><b>How it works:</b> Click the green button below. It downloads a polished PDF scorecard and opens Gmail with the BCC already set. Just add the recipient, drag in the PDF, and send.</div>
+  </div>
+
+  <div class="bcc-reminder">
+    <strong>Auto-BCC:</strong> Gmail will open with <strong>lreynes@anderson-auto.net</strong> and <strong>lsneed@anderson-auto.net</strong> already in BCC.
+  </div>
+
+  <div class="actions">
+    <button class="btn btn-primary" onclick="sendScorecard()">&#9993; Download PDF &amp; Open Gmail</button>
+    <button class="btn btn-pdf" onclick="downloadPDFOnly()">&#128196; PDF Only</button>
+    <button class="btn btn-secondary" onclick="resetForm()">&#8635; Reset</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const { jsPDF } = window.jspdf;
+
+  document.getElementById('call_date').valueAsDate = new Date();
+
+  function toggle(btn, type) {
+    const parent = btn.closest('.check-btns');
+    if (type === 'flag') { btn.classList.toggle('active'); return; }
+    const btns = parent.querySelectorAll('.check-btn');
+    const wasActive = btn.classList.contains('active');
+    btns.forEach(b => b.classList.remove('active'));
+    if (!wasActive) btn.classList.add('active');
+  }
+
+  function getFormData() {
+    const rep = document.getElementById('rep_name').value || '';
+    const phone = document.getElementById('customer_phone').value || '';
+    const link = document.getElementById('carwars_link').value || '';
+    const date = document.getElementById('call_date').value || '';
+    const reviewer = document.getElementById('reviewer').value || '';
+    const notes = document.getElementById('notes').value || '';
+
+    const didWe = [];
+    document.querySelectorAll('#did-we-list li').forEach(li => {
+      const label = li.dataset.item;
+      const yesBtn = li.querySelector('.check-btn.yes');
+      const noBtn = li.querySelector('.check-btn.no');
+      let status = '--';
+      if (yesBtn && yesBtn.classList.contains('active')) status = 'YES';
+      if (noBtn && noBtn.classList.contains('active')) status = 'NO';
+      didWe.push({ label, status });
+    });
+
+    const didNot = [];
+    document.querySelectorAll('#did-not-list li').forEach(li => {
+      const label = li.dataset.item;
+      const flagBtn = li.querySelector('.check-btn.flag');
+      const flagged = flagBtn && flagBtn.classList.contains('active');
+      didNot.push({ label, flagged });
+    });
+
+    return { rep, phone, link, date, reviewer, notes, didWe, didNot };
+  }
+
+  function generatePDF() {
+    const d = getFormData();
+    const doc = new jsPDF({ unit: 'pt', format: 'letter' });
+    const W = 612, H = 792;
+    const M = 50; // margin
+    let y = 45;
+
+    // --- HEADER BAR ---
+    doc.setFillColor(26, 26, 46);
+    doc.rect(0, 0, W, 70, 'F');
+    doc.setFontSize(22);
+    doc.setTextColor(255, 255, 255);
+    doc.setFont('helvetica', 'bold');
+    doc.text('Inbound Sales Call', W / 2, 38, { align: 'center' });
+    doc.setFontSize(10);
+    doc.setTextColor(180, 180, 200);
+    doc.text('Anderson Automotive Group  \u2022  Call Scorecard', W / 2, 56, { align: 'center' });
+
+    // Red accent line
+    doc.setFillColor(192, 57, 43);
+    doc.rect(0, 70, W, 4, 'F');
+
+    y = 100;
+
+    // --- INFO SECTION ---
+    const drawInfoRow = (label, value, x, yPos, maxW) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(140, 140, 140);
+      doc.text(label.toUpperCase(), x, yPos);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(45, 45, 45);
+      doc.text(value || '—', x, yPos + 14, { maxWidth: maxW || 200 });
+    };
+
+    drawInfoRow('Rep Name', d.rep, M, y, 200);
+    drawInfoRow('Customer Phone', d.phone, 300, y, 200);
+    y += 36;
+    drawInfoRow('Date', d.date, M, y, 200);
+    drawInfoRow('Reviewed By', d.reviewer, 300, y, 200);
+    y += 36;
+
+    // CarWars link - show truncated with "see below" note
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(140, 140, 140);
+    doc.text('CARWARS CALL LINK', M, y);
+    if (d.link) {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(52, 152, 219);
+      doc.textWithLink('Click here to listen to this call on CarWars', M, y + 14, { url: d.link });
+    } else {
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(45, 45, 45);
+      doc.text('—', M, y + 14);
+    }
+    y += 32;
+
+    // --- DID WE SECTION ---
+    doc.setFillColor(39, 174, 96);
+    doc.circle(M + 4, y + 3, 4, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(45, 45, 45);
+    doc.text('Did we:', M + 14, y + 7);
+
+    // Column headers
+    doc.setFontSize(10);
+    doc.setTextColor(100, 100, 100);
+    doc.text('\u2713', W - M - 55, y + 7);
+    doc.text('\u2717', W - M - 22, y + 7);
+    y += 18;
+
+    const rowH = 28;
+    d.didWe.forEach((item, i) => {
+      // Alternating row bg
+      if (i % 2 === 0) {
+        doc.setFillColor(248, 249, 250);
+        doc.rect(M, y - 2, W - 2 * M, rowH, 'F');
+      }
+      // Green left bar
+      doc.setFillColor(39, 174, 96);
+      doc.rect(M, y - 2, 4, rowH, 'F');
+
+      // Label
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(45, 45, 45);
+      doc.text(item.label, M + 14, y + 14);
+
+      // Check/X markers
+      const checkX = W - M - 58;
+      const crossX = W - M - 25;
+      const markerY = y + 4;
+      const boxSize = 16;
+
+      if (item.status === 'YES') {
+        doc.setFillColor(39, 174, 96);
+        doc.roundedRect(checkX, markerY, boxSize, boxSize, 3, 3, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('\u2713', checkX + 3, markerY + 12);
+      } else {
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(checkX, markerY, boxSize, boxSize, 3, 3, 'S');
+      }
+
+      if (item.status === 'NO') {
+        doc.setFillColor(231, 76, 60);
+        doc.roundedRect(crossX, markerY, boxSize, boxSize, 3, 3, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(12);
+        doc.setFont('helvetica', 'bold');
+        doc.text('\u2717', crossX + 3, markerY + 12);
+      } else {
+        doc.setDrawColor(200, 200, 200);
+        doc.setLineWidth(0.5);
+        doc.roundedRect(crossX, markerY, boxSize, boxSize, 3, 3, 'S');
+      }
+
+      // Subtle bottom line
+      doc.setDrawColor(230, 230, 230);
+      doc.setLineWidth(0.3);
+      doc.line(M, y + rowH - 2, W - M, y + rowH - 2);
+
+      y += rowH;
+    });
+
+    y += 16;
+
+    // --- WE DID NOT SECTION ---
+    doc.setFillColor(192, 57, 43);
+    doc.circle(M + 4, y + 3, 4, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(45, 45, 45);
+    doc.text('We did not:', M + 14, y + 7);
+    y += 18;
+
+    d.didNot.forEach((item, i) => {
+      if (i % 2 === 0) {
+        doc.setFillColor(248, 249, 250);
+        doc.rect(M, y - 2, W - 2 * M, rowH, 'F');
+      }
+      // Red left bar
+      doc.setFillColor(192, 57, 43);
+      doc.rect(M, y - 2, 4, rowH, 'F');
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(11);
+      doc.setTextColor(45, 45, 45);
+      doc.text(item.label, M + 14, y + 14);
+
+      // Flag indicator
+      const flagX = W - M - 60;
+      if (item.flagged) {
+        doc.setFillColor(231, 76, 60);
+        doc.roundedRect(flagX, y + 2, 50, 18, 3, 3, 'F');
+        doc.setTextColor(255, 255, 255);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('FLAGGED', flagX + 5, y + 14);
+      } else {
+        doc.setFillColor(230, 245, 230);
+        doc.roundedRect(flagX, y + 2, 50, 18, 3, 3, 'F');
+        doc.setTextColor(39, 174, 96);
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.text('OK', flagX + 18, y + 14);
+      }
+
+      doc.setDrawColor(230, 230, 230);
+      doc.setLineWidth(0.3);
+      doc.line(M, y + rowH - 2, W - M, y + rowH - 2);
+
+      y += rowH;
+    });
+
+    y += 16;
+
+    // --- NOTES ---
+    doc.setFillColor(39, 174, 96);
+    doc.circle(M + 4, y + 3, 4, 'F');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(13);
+    doc.setTextColor(45, 45, 45);
+    doc.text('Notes / Coaching Points', M + 14, y + 7);
+    y += 14;
+
+    doc.setFillColor(248, 249, 250);
+    doc.roundedRect(M, y, W - 2 * M, 70, 4, 4, 'F');
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(60, 60, 60);
+    const noteLines = doc.splitTextToSize(d.notes || '(none)', W - 2 * M - 20);
+    doc.text(noteLines, M + 10, y + 16);
+
+    y += 80;
+
+    // --- FOOTER ---
+    doc.setFontSize(7);
+    doc.setTextColor(170, 170, 170);
+    doc.text('Anderson Automotive Group \u2022 Inbound Sales Call Scorecard', W / 2, H - 25, { align: 'center' });
+
+    return doc;
+  }
+
+  function getFilename() {
+    const rep = document.getElementById('rep_name').value || 'Rep';
+    const date = document.getElementById('call_date').value || 'undated';
+    return `Scorecard - ${rep} - ${date}.pdf`;
+  }
+
+  function sendScorecard() {
+    const d = getFormData();
+    if (!d.rep) { showToast('Please enter the rep name first'); return; }
+
+    // 1. Generate and download PDF
+    const doc = generatePDF();
+    doc.save(getFilename());
+
+    // 2. Open Gmail compose with short body + BCC
+    const rep = d.rep || 'Rep';
+    const subject = encodeURIComponent(`Inbound Sales Call Scorecard - ${rep}`);
+    const bodyText = `Hi,\n\nAttached is the Inbound Sales Call Scorecard for ${rep}.\n\nThe CarWars call link is in the PDF — just click it to listen.\n\nBest regards`;
+    const body = encodeURIComponent(bodyText);
+    const bcc = encodeURIComponent('lreynes@anderson-auto.net,lsneed@anderson-auto.net');
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}&bcc=${bcc}`;
+
+    setTimeout(() => {
+      window.open(gmailUrl, '_blank');
+    }, 500);
+
+    showToast('PDF downloaded! Drag it into the Gmail window to attach.');
+  }
+
+  function downloadPDFOnly() {
+    const d = getFormData();
+    if (!d.rep) { showToast('Please enter the rep name first'); return; }
+    const doc = generatePDF();
+    doc.save(getFilename());
+    showToast('PDF downloaded!');
+  }
+
+  function resetForm() {
+    if (!confirm('Clear all fields and start over?')) return;
+    document.querySelectorAll('input, textarea').forEach(el => {
+      if (el.type === 'date') el.valueAsDate = new Date();
+      else el.value = '';
+    });
+    document.querySelectorAll('.check-btn.active').forEach(b => b.classList.remove('active'));
+    showToast('Form cleared');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+
+</body>
+</html>
