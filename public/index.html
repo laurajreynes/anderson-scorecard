@@ -707,37 +707,90 @@
     const preAsk = d.stages.slice(0, 5);
     const postAsk = d.stages.slice(5);
 
+    // Tab labels for PDF — hardcoded 2-line breaks to mirror the guide
+    const tabLabelMap = {
+      'Positive Greeting':       ['POSITIVE', 'GREETING'],
+      'Create Flexibility':      ['CREATE', 'FLEXIBILITY'],
+      'Engage with Questions':   ['ENGAGE', 'WITH ?S'],
+      'Get Their Contact':       ['GET THEIR', 'CONTACT'],
+      'Answer + Provide Options':['ANSWER +', 'OPTIONS'],
+      'Hook the Trade':          ['HOOK THE', 'TRADE'],
+      'Appointment Preview':     ['APPT.', 'PREVIEW'],
+    };
+    const hintMap = {
+      'Positive Greeting':       'Thank you for calling [dealership], this is ___.',
+      'Create Flexibility':      'Would you consider something similar?',
+      'Engage with Questions':   'Features, interest, have you driven it?',
+      'Get Their Contact':       'Cell number, name spelling — before the hold',
+      'Answer + Provide Options':'Confirm availability, Family Plan, options',
+      'Hook the Trade':          'Adding or replacing? Year / condition / mileage',
+      'Appointment Preview':     'Confirms date/time, sends text, checks in',
+    };
+
+    // Vector check mark (white on colored box)
+    const drawCheck = (bx, by, size) => {
+      doc.setDrawColor(255, 255, 255);
+      doc.setLineWidth(size * 0.16);
+      doc.line(bx + size * 0.22, by + size * 0.55, bx + size * 0.44, by + size * 0.75);
+      doc.line(bx + size * 0.44, by + size * 0.75, bx + size * 0.80, by + size * 0.28);
+    };
+    // Vector X (white on colored box)
+    const drawX = (bx, by, size) => {
+      doc.setDrawColor(255, 255, 255);
+      doc.setLineWidth(size * 0.16);
+      doc.line(bx + size * 0.28, by + size * 0.28, bx + size * 0.72, by + size * 0.72);
+      doc.line(bx + size * 0.72, by + size * 0.28, bx + size * 0.28, by + size * 0.72);
+    };
+
     sectionTitle('Call Stages');
 
     const drawStageRow = (item) => {
-      const rowH = 28;
-      // Blue tab (mirrors the guide)
-      doc.setFillColor(90, 135, 170);
-      doc.rect(M, y, 12, rowH, 'F');
-      // Row bg
+      const rowH = 34;
+      const tabW = 88;
+
+      // Tab color reflects status
+      if (item.status === 'YES')      doc.setFillColor(47, 133, 90);
+      else if (item.status === 'NO')  doc.setFillColor(210, 58, 58);
+      else                             doc.setFillColor(90, 135, 170);
+      doc.rect(M, y, tabW, rowH, 'F');
+
+      // Body bg
       doc.setFillColor(252, 253, 254);
-      doc.rect(M + 12, y, W - 2 * M - 12, rowH, 'F');
+      doc.rect(M + tabW, y, W - 2 * M - tabW, rowH, 'F');
+
+      // Outer border
       doc.setDrawColor(227, 232, 238);
       doc.setLineWidth(0.5);
-      doc.rect(M + 12, y, W - 2 * M - 12, rowH, 'S');
+      doc.rect(M, y, W - 2 * M, rowH, 'S');
 
+      // Tab text (2 lines, centered)
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(255, 255, 255);
+      const lines = tabLabelMap[item.label] || [item.label.toUpperCase()];
+      const lineH = 11;
+      const startY = y + rowH / 2 - ((lines.length - 1) * lineH) / 2 + 3;
+      lines.forEach((line, i) => {
+        doc.text(line, M + tabW / 2, startY + i * lineH, { align: 'center' });
+      });
+
+      // Hint in body
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(31, 41, 55);
-      doc.text(item.label, M + 22, y + 18);
+      doc.setFontSize(10);
+      doc.setTextColor(75, 85, 99);
+      const hint = hintMap[item.label] || '';
+      doc.text(hint, M + tabW + 10, y + rowH / 2 + 3, { maxWidth: W - 2 * M - tabW - 80 });
 
+      // Yes / No boxes
+      const boxSize = 16;
       const checkX = W - M - 58;
       const crossX = W - M - 28;
-      const markerY = y + 6;
-      const boxSize = 16;
+      const markerY = y + (rowH - boxSize) / 2;
 
       if (item.status === 'YES') {
         doc.setFillColor(47, 133, 90);
         doc.roundedRect(checkX, markerY, boxSize, boxSize, 3, 3, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.text('\u2713', checkX + 3.5, markerY + 12);
+        drawCheck(checkX, markerY, boxSize);
       } else {
         doc.setDrawColor(200, 208, 216);
         doc.setLineWidth(0.7);
@@ -746,10 +799,7 @@
       if (item.status === 'NO') {
         doc.setFillColor(210, 58, 58);
         doc.roundedRect(crossX, markerY, boxSize, boxSize, 3, 3, 'F');
-        doc.setTextColor(255, 255, 255);
-        doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
-        doc.text('\u2717', crossX + 3.5, markerY + 12);
+        drawX(crossX, markerY, boxSize);
       } else {
         doc.setDrawColor(200, 208, 216);
         doc.setLineWidth(0.7);
@@ -761,12 +811,14 @@
 
     preAsk.forEach(drawStageRow);
 
-    // APPOINTMENT ASK big block
+    // APPOINTMENT ASK big block — tabbed like the guide
     y += 6;
     const asked = d.appt === 'YES';
     const missed = d.appt === 'NO';
-    const askBoxH = 92;
+    const askBoxH = 96;
+    const askTabW = 88;
 
+    // Outer shell
     if (missed) {
       doc.setFillColor(253, 236, 236);
       doc.setDrawColor(210, 58, 58);
@@ -775,68 +827,81 @@
       doc.setDrawColor(90, 135, 170);
     }
     doc.setLineWidth(2);
-    doc.roundedRect(M, y, W - 2 * M, askBoxH, 8, 8, 'FD');
+    doc.roundedRect(M, y, W - 2 * M, askBoxH, 6, 6, 'FD');
 
-    const tabH = 22;
+    // Blue/red side tab (mirrors the guide's stage tabs, extra tall & prominent)
     if (missed) doc.setFillColor(210, 58, 58);
-    else doc.setFillColor(90, 135, 170);
-    doc.roundedRect(M, y, W - 2 * M, tabH, 8, 8, 'F');
-    doc.rect(M, y + tabH - 8, W - 2 * M, 8, 'F');
+    else        doc.setFillColor(90, 135, 170);
+    doc.rect(M, y, askTabW, askBoxH, 'F');
 
+    // Tab label — big 2-line
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(11);
+    doc.setFontSize(10.5);
     doc.setTextColor(255, 255, 255);
-    doc.text('\u2605 APPOINTMENT ASK', M + 14, y + 15);
+    doc.text('APPOINTMENT', M + askTabW / 2, y + askBoxH / 2 - 4, { align: 'center' });
+    doc.text('ASK', M + askTabW / 2, y + askBoxH / 2 + 10, { align: 'center' });
 
+    // Status pill (top right corner inside body)
     const pillText = asked ? 'ASKED' : (missed ? 'MISSED' : 'NOT SCORED');
-    doc.setFontSize(9);
-    const pw = doc.getTextWidth(pillText) + 16;
-    doc.setDrawColor(255, 255, 255);
-    doc.setLineWidth(0.8);
-    doc.roundedRect(W - M - 12 - pw, y + 5, pw, 13, 6, 6, 'S');
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(9);
+    doc.setFontSize(8);
+    const pw = doc.getTextWidth(pillText) + 14;
+    if (missed) { doc.setFillColor(210, 58, 58); doc.setDrawColor(210, 58, 58); }
+    else if (asked) { doc.setFillColor(47, 133, 90); doc.setDrawColor(47, 133, 90); }
+    else { doc.setFillColor(200, 208, 216); doc.setDrawColor(200, 208, 216); }
+    doc.roundedRect(W - M - 10 - pw, y + 8, pw, 13, 6, 6, 'F');
     doc.setTextColor(255, 255, 255);
-    doc.text(pillText, W - M - 12 - pw + 8, y + 14);
+    doc.text(pillText, W - M - 10 - pw + 7, y + 17);
 
-    const bodyY = y + tabH;
+    // Body content
+    const bodyX = M + askTabW + 16;
     if (missed) {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(54);
-      doc.setTextColor(210, 58, 58);
-      doc.text('\u2717', M + 24, bodyY + 54);
+      // Draw giant red X as vector (no unicode)
+      const xSize = 46;
+      const xBoxX = bodyX;
+      const xBoxY = y + (askBoxH - xSize) / 2;
+      doc.setDrawColor(210, 58, 58);
+      doc.setLineWidth(xSize * 0.14);
+      doc.line(xBoxX, xBoxY, xBoxX + xSize, xBoxY + xSize);
+      doc.line(xBoxX + xSize, xBoxY, xBoxX, xBoxY + xSize);
 
-      doc.setFontSize(15);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(14);
       doc.setTextColor(176, 40, 40);
-      doc.text('MISSED APPOINTMENT ASK', M + 92, bodyY + 28);
+      doc.text('MISSED APPOINTMENT ASK', bodyX + xSize + 18, y + 34);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(10.5);
+      doc.setFontSize(10);
       doc.setTextColor(80, 40, 40);
-      const msg = 'No appointment was requested on this call. This is a critical coaching moment - address it with the rep today.';
-      const lines = doc.splitTextToSize(msg, W - 2 * M - 110);
-      doc.text(lines, M + 92, bodyY + 44);
+      const msg = 'No appointment was requested on this call. This is a critical coaching moment — address it with the rep today.';
+      const lines = doc.splitTextToSize(msg, W - M - (bodyX + xSize + 18) - 14);
+      doc.text(lines, bodyX + xSize + 18, y + 50);
     } else if (asked) {
-      doc.setFont('helvetica', 'bold');
-      doc.setFontSize(40);
-      doc.setTextColor(47, 133, 90);
-      doc.text('\u2713', M + 28, bodyY + 50);
+      // Draw big green check as vector
+      const cSize = 36;
+      const cBoxX = bodyX + 4;
+      const cBoxY = y + (askBoxH - cSize) / 2;
+      doc.setDrawColor(47, 133, 90);
+      doc.setLineWidth(cSize * 0.16);
+      doc.line(cBoxX + cSize * 0.06, cBoxY + cSize * 0.55, cBoxX + cSize * 0.40, cBoxY + cSize * 0.85);
+      doc.line(cBoxX + cSize * 0.40, cBoxY + cSize * 0.85, cBoxX + cSize * 0.95, cBoxY + cSize * 0.15);
 
-      doc.setFontSize(15);
-      doc.setTextColor(31, 41, 55);
-      doc.text('Did the rep ask for the appointment?', M + 92, bodyY + 28);
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(13);
+      doc.setFontSize(14);
+      doc.setTextColor(31, 41, 55);
+      doc.text('Did the rep ask for the appointment?', bodyX + cSize + 20, y + 36);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(12);
       doc.setTextColor(47, 133, 90);
-      doc.text('Yes - appointment was requested.', M + 92, bodyY + 48);
+      doc.text('Yes — appointment was requested.', bodyX + cSize + 20, y + 54);
     } else {
       doc.setFont('helvetica', 'bold');
-      doc.setFontSize(15);
+      doc.setFontSize(14);
       doc.setTextColor(31, 41, 55);
-      doc.text('Did the rep ask for the appointment?', M + 14, bodyY + 28);
+      doc.text('Did the rep ask for the appointment?', bodyX, y + 40);
       doc.setFont('helvetica', 'normal');
-      doc.setFontSize(11);
+      doc.setFontSize(10.5);
       doc.setTextColor(138, 148, 160);
-      doc.text('Not scored on this review.', M + 14, bodyY + 48);
+      doc.text('Not scored on this review.', bodyX, y + 58);
     }
 
     y += askBoxH + 14;
