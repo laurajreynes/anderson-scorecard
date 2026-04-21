@@ -5,138 +5,367 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Inbound Sales Call Scorecard</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
+  :root {
+    --navy:    #2E5978;
+    --navy-2:  #3B6B8F;
+    --navy-3:  #1E3F57;
+    --ink:     #1F2937;
+    --ink-2:   #4B5563;
+    --muted:   #8A94A0;
+    --line:    #E3E8EE;
+    --bg:      #F4F6F9;
+    --panel:   #FFFFFF;
+    --ok:      #2F855A;
+    --ok-soft: #E9F5EE;
+    --bad:     #D23A3A;
+    --bad-2:   #B02828;
+    --bad-soft:#FDECEC;
+    --highlight:#FFF0A6;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { -webkit-font-smoothing: antialiased; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #f0f2f5;
-    color: #2d2d2d;
-    padding: 20px;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    padding: 24px 16px 60px;
+    line-height: 1.4;
   }
   .container {
-    max-width: 680px;
+    max-width: 760px;
     margin: 0 auto;
-    background: #fff;
-    border-radius: 12px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+    background: var(--panel);
+    border-radius: 6px;
+    box-shadow: 0 1px 2px rgba(15,23,42,.04), 0 8px 32px rgba(15,23,42,.08);
     overflow: hidden;
+    position: relative;
   }
-  .header {
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    color: #fff;
-    padding: 28px 32px 22px;
-    text-align: center;
-  }
-  .header h1 { font-size: 26px; font-weight: 700; letter-spacing: -0.5px; }
-  .header .subtitle { font-size: 13px; opacity: 0.7; margin-top: 4px; }
-  .red-line { height: 4px; background: linear-gradient(90deg, #c0392b, #e74c3c); }
-  .form-body { padding: 24px 32px 16px; }
 
+  /* Header */
+  .header {
+    padding: 30px 36px 18px;
+    border-bottom: 1px solid var(--line);
+  }
+  .header .eyebrow {
+    font-size: 11px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--navy);
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .header h1 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .header .subtitle {
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .header .subtitle strong { color: var(--navy); font-weight: 700; }
+
+  .form-body { padding: 22px 36px 8px; }
+
+  /* Info grid */
   .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin-bottom: 24px;
+    gap: 14px 18px;
+    margin-bottom: 22px;
   }
   .info-grid .full-width { grid-column: 1 / -1; }
   .field-group label {
-    display: block; font-size: 11px; font-weight: 600;
-    text-transform: uppercase; letter-spacing: 0.5px; color: #888; margin-bottom: 5px;
+    display: block; font-size: 10.5px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 1px;
+    color: var(--muted); margin-bottom: 6px;
   }
   .field-group input, .field-group textarea {
     width: 100%; padding: 10px 12px;
-    border: 1.5px solid #e0e0e0; border-radius: 8px;
-    font-size: 14px; transition: border-color 0.2s; font-family: inherit;
+    border: 1px solid var(--line); border-radius: 6px;
+    font-size: 14px; color: var(--ink);
+    font-family: inherit; background: #FCFDFE;
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
   .field-group input:focus, .field-group textarea:focus {
-    outline: none; border-color: #3498db;
-    box-shadow: 0 0 0 3px rgba(52,152,219,0.1);
+    outline: none; border-color: var(--navy-2);
+    box-shadow: 0 0 0 3px rgba(59,107,143,0.12);
+    background: #fff;
   }
 
-  .section-header {
-    font-size: 15px; font-weight: 700; margin: 20px 0 10px;
-    display: flex; align-items: center; gap: 8px;
+  /* Section header */
+  .section-title {
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin: 10px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--navy);
+    display: flex; align-items: center; gap: 10px;
   }
-  .section-header .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
-  .dot-green { background: #27ae60; }
-  .dot-red { background: #c0392b; }
+  .section-title .count {
+    font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: none;
+  }
 
+  /* Stage rows with blue side tabs (mirrors the guide) */
   .checklist { list-style: none; }
   .checklist li {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 14px; border-radius: 8px; margin-bottom: 4px; transition: background 0.15s;
+    display: flex; align-items: stretch;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    background: #fff;
+    transition: border-color 0.15s, background 0.15s;
   }
-  .checklist li:nth-child(odd) { background: #f8f9fa; }
-  .checklist li:hover { background: #eef5fd; }
-  .checklist li .item-label { font-size: 14px; flex: 1; }
+  .checklist li:hover { border-color: #C7D3DD; }
+
+  .item-tab {
+    width: 82px;
+    min-width: 82px;
+    background: var(--navy);
+    color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    padding: 10px 6px;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-align: center;
+    line-height: 1.15;
+  }
+  .checklist li.active-yes .item-tab { background: var(--ok); }
+  .checklist li.active-no  .item-tab { background: var(--bad); }
+
+  .item-body {
+    flex: 1;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px 12px 16px;
+    gap: 14px;
+  }
+  .item-body .item-label {
+    font-size: 14px; color: var(--ink); font-weight: 500;
+  }
+  .item-body .item-hint {
+    display: block; font-size: 11.5px; color: var(--muted); font-weight: 400; margin-top: 2px;
+  }
   .check-btns { display: flex; gap: 6px; flex-shrink: 0; }
   .check-btn {
-    width: 36px; height: 36px; border: 2px solid #ddd; border-radius: 8px;
+    width: 38px; height: 38px; border: 1.5px solid var(--line); border-radius: 6px;
     background: #fff; cursor: pointer; font-size: 18px;
     display: flex; align-items: center; justify-content: center;
-    transition: all 0.15s; color: #ccc;
+    transition: all 0.15s; color: #BAC3CD;
   }
-  .check-btn:hover { border-color: #aaa; }
-  .check-btn.yes.active { background: #27ae60; border-color: #27ae60; color: #fff; }
-  .check-btn.no.active { background: #e74c3c; border-color: #e74c3c; color: #fff; }
-  .check-btn.flag { width: auto; padding: 0 12px; font-size: 13px; }
-  .check-btn.flag.active { background: #e74c3c; border-color: #e74c3c; color: #fff; }
+  .check-btn:hover { border-color: #9AAEC1; color: #6B7A88; }
+  .check-btn.yes.active { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .check-btn.no.active  { background: var(--bad); border-color: var(--bad); color: #fff; }
 
-  .notes-area { width: 100%; min-height: 80px; resize: vertical; }
+  /* APPOINTMENT ASK — huge standalone card */
+  .appt-card {
+    margin: 22px 0 18px;
+    border: 2px solid var(--navy);
+    border-radius: 10px;
+    background: linear-gradient(180deg, #FFFFFF 0%, #F7FAFC 100%);
+    overflow: hidden;
+    position: relative;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  }
+  .appt-card .appt-tab {
+    background: var(--navy);
+    color: #fff;
+    padding: 10px 22px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    display: flex; align-items: center; justify-content: space-between;
+    transition: background 0.2s;
+  }
+  .appt-card .appt-tab .status-pill {
+    font-size: 10.5px; letter-spacing: 1px; padding: 3px 10px; border-radius: 999px;
+    background: rgba(255,255,255,0.18); font-weight: 700;
+  }
+  .appt-body { padding: 26px 26px 22px; text-align: center; }
+  .appt-body h2 {
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.5px;
+    margin-bottom: 6px;
+  }
+  .appt-body .appt-sub {
+    font-size: 13px; color: var(--ink-2); margin-bottom: 20px;
+    max-width: 420px; margin-left: auto; margin-right: auto;
+  }
+  .appt-body .appt-sub .highlight {
+    background: var(--highlight); padding: 1px 6px; border-radius: 3px;
+  }
+  .appt-choices { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .appt-choice {
+    flex: 1; min-width: 180px; max-width: 240px;
+    padding: 22px 16px;
+    border: 2px solid var(--line);
+    border-radius: 10px;
+    background: #fff;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+  .appt-choice:hover { border-color: #9AAEC1; transform: translateY(-1px); }
+  .appt-choice .big-mark {
+    width: 54px; height: 54px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; font-weight: 700; color: #BAC3CD;
+    border: 2.5px solid var(--line);
+    transition: all 0.15s;
+  }
+  .appt-choice .choice-label {
+    font-size: 14px; font-weight: 700; color: var(--ink-2); letter-spacing: 1px; text-transform: uppercase;
+  }
+  .appt-choice.yes.active { border-color: var(--ok); background: var(--ok-soft); }
+  .appt-choice.yes.active .big-mark { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .appt-choice.yes.active .choice-label { color: var(--ok); }
+  .appt-choice.no.active { border-color: var(--bad); background: var(--bad-soft); }
+  .appt-choice.no.active .big-mark { background: var(--bad); border-color: var(--bad); color: #fff; }
+  .appt-choice.no.active .choice-label { color: var(--bad); }
 
-  .actions { padding: 20px 32px 28px; display: flex; gap: 10px; flex-wrap: wrap; }
+  /* Giant red X banner when the appt ask is missed */
+  .miss-banner {
+    display: none;
+    margin-top: 22px;
+    padding: 24px 20px;
+    background: var(--bad);
+    color: #fff;
+    border-radius: 10px;
+    text-align: center;
+    align-items: center; justify-content: center; gap: 18px;
+    box-shadow: 0 6px 20px rgba(210,58,58,0.25);
+  }
+  .miss-banner.show { display: flex; }
+  .miss-banner .giant-x {
+    font-size: 72px;
+    line-height: 1;
+    font-weight: 900;
+    flex-shrink: 0;
+  }
+  .miss-banner .miss-copy { text-align: left; }
+  .miss-banner .miss-title {
+    font-size: 18px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 4px;
+  }
+  .miss-banner .miss-desc {
+    font-size: 13px; opacity: 0.92; max-width: 380px; line-height: 1.45;
+  }
+  .appt-card.missed {
+    border-color: var(--bad);
+    background: #fff;
+    box-shadow: 0 0 0 4px rgba(210,58,58,0.08);
+  }
+  .appt-card.missed .appt-tab { background: var(--bad); }
+
+  /* Flags */
+  .flag-list { list-style: none; margin-bottom: 6px; }
+  .flag-list li {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; border: 1px solid var(--line); border-radius: 6px;
+    margin-bottom: 6px; background: #fff; font-size: 13.5px; color: var(--ink-2);
+  }
+  .flag-list li .item-label { flex: 1; }
+  .check-btn.flag {
+    width: auto; padding: 0 14px; font-size: 12px; font-weight: 700; height: 32px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+  }
+  .check-btn.flag.active { background: var(--bad); border-color: var(--bad); color: #fff; }
+
+  /* Notes */
+  .notes-wrap { margin-top: 14px; }
+  .notes-area {
+    width: 100%; min-height: 90px; resize: vertical;
+    padding: 12px; border: 1px solid var(--line); border-radius: 6px;
+    font-size: 13.5px; color: var(--ink); font-family: inherit;
+    background: #FCFDFE;
+  }
+  .notes-area:focus {
+    outline: none; border-color: var(--navy-2);
+    box-shadow: 0 0 0 3px rgba(59,107,143,0.12); background: #fff;
+  }
+
+  /* Footer */
+  .bcc-reminder {
+    background: #F1F6FA; border-left: 3px solid var(--navy);
+    padding: 12px 16px; margin: 4px 36px 12px;
+    font-size: 12px; color: var(--ink-2); line-height: 1.5; border-radius: 4px;
+  }
+  .bcc-reminder strong { color: var(--navy); }
+
+  .step-indicator {
+    background: #FCFDFE; border: 1px solid var(--line); border-radius: 6px;
+    padding: 12px 14px; margin: 4px 36px 12px;
+    font-size: 12.5px; line-height: 1.5; color: var(--ink-2);
+  }
+  .step-indicator b { color: var(--navy); }
+
+  .actions {
+    padding: 16px 36px 30px;
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
   .btn {
-    padding: 12px 24px; border: none; border-radius: 8px;
-    font-size: 14px; font-weight: 600; cursor: pointer;
-    transition: all 0.2s; display: flex; align-items: center; gap: 6px;
+    padding: 13px 22px; border: none; border-radius: 6px;
+    font-size: 14px; font-weight: 700; cursor: pointer;
+    transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: inherit; letter-spacing: 0.2px;
   }
-  .btn-primary { background: #27ae60; color: #fff; flex: 1; justify-content: center; font-size: 15px; }
-  .btn-primary:hover { background: #219a52; }
-  .btn-secondary { background: #f0f2f5; color: #555; }
-  .btn-secondary:hover { background: #e2e5ea; }
-  .btn-pdf { background: #2c3e50; color: #fff; }
-  .btn-pdf:hover { background: #1a252f; }
+  .btn-primary { background: var(--navy); color: #fff; flex: 1; min-width: 220px; }
+  .btn-primary:hover { background: var(--navy-3); }
+  .btn-secondary { background: #EEF2F6; color: var(--ink-2); }
+  .btn-secondary:hover { background: #E3E8EE; }
+  .btn-pdf { background: #fff; color: var(--navy); border: 1.5px solid var(--navy); }
+  .btn-pdf:hover { background: #F1F6FA; }
 
   .toast {
-    position: fixed; bottom: 30px; left: 50%;
+    position: fixed; bottom: 28px; left: 50%;
     transform: translateX(-50%) translateY(100px);
-    background: #2d2d2d; color: #fff; padding: 12px 24px;
-    border-radius: 8px; font-size: 14px; transition: transform 0.3s ease; z-index: 100;
+    background: var(--ink); color: #fff; padding: 12px 22px;
+    border-radius: 6px; font-size: 13.5px; font-weight: 500;
+    transition: transform 0.25s ease; z-index: 100;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.18);
   }
   .toast.show { transform: translateX(-50%) translateY(0); }
 
-  .bcc-reminder {
-    background: #edf7ed; border: 1px solid #27ae60; border-radius: 8px;
-    padding: 12px 16px; margin: 0 32px 8px; font-size: 12px; color: #2d2d2d; line-height: 1.5;
-  }
-  .bcc-reminder strong { color: #27ae60; }
-
-  .step-indicator {
-    background: #f8f9fa; border-radius: 8px; padding: 14px 16px;
-    margin: 0 32px 12px; font-size: 13px; line-height: 1.6; color: #555;
-    border-left: 4px solid #27ae60;
-  }
-  .step-indicator .step { margin-bottom: 4px; }
-  .step-indicator .step b { color: #2d2d2d; }
-
-  @media (max-width: 600px) {
+  @media (max-width: 640px) {
     body { padding: 10px; }
-    .form-body, .actions, .bcc-reminder, .step-indicator { padding-left: 16px; padding-right: 16px; }
+    .header, .form-body { padding-left: 18px; padding-right: 18px; }
+    .bcc-reminder, .step-indicator, .actions { margin-left: 18px; margin-right: 18px; padding-left: 14px; padding-right: 14px; }
     .info-grid { grid-template-columns: 1fr; }
     .header h1 { font-size: 22px; }
+    .item-tab { width: 62px; min-width: 62px; font-size: 9px; letter-spacing: 0.5px; }
+    .appt-body h2 { font-size: 22px; }
+    .miss-banner { flex-direction: column; text-align: center; }
+    .miss-banner .miss-copy { text-align: center; }
   }
 </style>
 </head>
 <body>
 
 <div class="container">
+
   <div class="header">
-    <h1>Inbound Sales Call</h1>
-    <div class="subtitle">Anderson Automotive Group &bull; Call Scorecard</div>
+    <div class="eyebrow">Anderson Automotive Group</div>
+    <h1>Inbound Sales Call Scorecard</h1>
+    <div class="subtitle">Mirrors the <strong>Phone Up Guide</strong> — score each step of the call</div>
   </div>
-  <div class="red-line"></div>
 
   <div class="form-body">
+
+    <!-- Call info -->
     <div class="info-grid">
       <div class="field-group">
         <label>Rep Name</label>
@@ -160,42 +389,174 @@
       </div>
     </div>
 
-    <div class="section-header"><span class="dot dot-green"></span> Did we:</div>
-    <ul class="checklist" id="did-we-list">
-      <li data-item="Positive Greeting"><span class="item-label">Positive Greeting</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
-      <li data-item="Engage with ?s"><span class="item-label">Engage with ?s</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
-      <li data-item="Get Their Info"><span class="item-label">Get Their Info</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
-      <li data-item="Create Flexibility"><span class="item-label">Create Flexibility</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
-      <li data-item="Answer Customer Questions"><span class="item-label">Answer Customer Questions</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
-      <li data-item="Hook the Trade"><span class="item-label">Hook the Trade</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
-      <li data-item="Appointment Ask"><span class="item-label">Appointment Ask</span><div class="check-btns"><button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button><button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button></div></li>
+    <!-- Call stages — mirrors the Phone Up Guide tabs -->
+    <div class="section-title">Call Stages <span class="count">Score each step</span></div>
+    <ul class="checklist" id="stages-list">
+      <li data-item="Positive Greeting">
+        <div class="item-tab">Positive<br>Greeting</div>
+        <div class="item-body">
+          <div>
+            <div class="item-label">Positive Greeting</div>
+            <span class="item-hint">"Thank you for calling [dealership], this is ___, how can I help you?"</span>
+          </div>
+          <div class="check-btns">
+            <button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button>
+            <button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button>
+          </div>
+        </div>
+      </li>
+      <li data-item="Create Flexibility">
+        <div class="item-tab">Create<br>Flexibility</div>
+        <div class="item-body">
+          <div>
+            <div class="item-label">Create Flexibility</div>
+            <span class="item-hint">"Would you consider something similar?" &mdash; opens alternatives</span>
+          </div>
+          <div class="check-btns">
+            <button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button>
+            <button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button>
+          </div>
+        </div>
+      </li>
+      <li data-item="Engage with Questions">
+        <div class="item-tab">Engage<br>with ?s</div>
+        <div class="item-body">
+          <div>
+            <div class="item-label">Engage with Questions</div>
+            <span class="item-hint">What interested you? What features matter? Have you driven it?</span>
+          </div>
+          <div class="check-btns">
+            <button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button>
+            <button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button>
+          </div>
+        </div>
+      </li>
+      <li data-item="Get Their Contact">
+        <div class="item-tab">Get Their<br>Contact</div>
+        <div class="item-body">
+          <div>
+            <div class="item-label">Get Their Contact</div>
+            <span class="item-hint">Cell number, name spelling &mdash; before the hold</span>
+          </div>
+          <div class="check-btns">
+            <button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button>
+            <button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button>
+          </div>
+        </div>
+      </li>
+      <li data-item="Answer + Provide Options">
+        <div class="item-tab">Answer +<br>Options</div>
+        <div class="item-body">
+          <div>
+            <div class="item-label">Answer + Provide Options</div>
+            <span class="item-hint">Confirm availability, mention Family Plan, offer similar options</span>
+          </div>
+          <div class="check-btns">
+            <button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button>
+            <button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button>
+          </div>
+        </div>
+      </li>
     </ul>
 
-    <div class="section-header"><span class="dot dot-red"></span> We did not:</div>
-    <ul class="checklist" id="did-not-list">
-      <li data-item="Reply right off that the car is sold"><span class="item-label">Reply right off that the car is sold</span><div class="check-btns"><button class="check-btn flag" onclick="toggle(this,'flag')">Flagged</button></div></li>
-      <li data-item="Tell them we'll check on it and call back"><span class="item-label">Tell them we'll check on it and call back</span><div class="check-btns"><button class="check-btn flag" onclick="toggle(this,'flag')">Flagged</button></div></li>
-      <li data-item="Tell them it's at another store"><span class="item-label">Tell them it's at another store</span><div class="check-btns"><button class="check-btn flag" onclick="toggle(this,'flag')">Flagged</button></div></li>
+    <!-- APPOINTMENT ASK — huge prominent section -->
+    <div class="appt-card" id="appt-card">
+      <div class="appt-tab">
+        <span>&#9733; Appointment Ask</span>
+        <span class="status-pill" id="appt-status">Not Scored</span>
+      </div>
+      <div class="appt-body">
+        <h2>Did the rep ask for the appointment?</h2>
+        <div class="appt-sub">
+          This is the <span class="highlight">most important moment of the call</span>. Missing the ask is a critical miss.
+        </div>
+        <div class="appt-choices">
+          <button type="button" class="appt-choice yes" id="appt-yes" onclick="setAppt('yes')">
+            <span class="big-mark">&#10003;</span>
+            <span class="choice-label">Yes &mdash; Asked</span>
+          </button>
+          <button type="button" class="appt-choice no" id="appt-no" onclick="setAppt('no')">
+            <span class="big-mark">&#10007;</span>
+            <span class="choice-label">No &mdash; Missed</span>
+          </button>
+        </div>
+
+        <div class="miss-banner" id="miss-banner">
+          <div class="giant-x">&#10007;</div>
+          <div class="miss-copy">
+            <div class="miss-title">MISSED APPOINTMENT ASK</div>
+            <div class="miss-desc">No appointment was requested on this call. This is a critical coaching moment &mdash; address it with the rep today.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Remaining stages -->
+    <ul class="checklist" id="stages-list-2">
+      <li data-item="Hook the Trade">
+        <div class="item-tab">Hook the<br>Trade</div>
+        <div class="item-body">
+          <div>
+            <div class="item-label">Hook the Trade</div>
+            <span class="item-hint">"Are you adding or replacing? Year / condition / mileage / color"</span>
+          </div>
+          <div class="check-btns">
+            <button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button>
+            <button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button>
+          </div>
+        </div>
+      </li>
+      <li data-item="Appointment Preview">
+        <div class="item-tab">Appt.<br>Preview</div>
+        <div class="item-body">
+          <div>
+            <div class="item-label">Appointment Preview</div>
+            <span class="item-hint">Confirms date/time, sends text, plans to check in beforehand</span>
+          </div>
+          <div class="check-btns">
+            <button class="check-btn yes" onclick="toggle(this,'yes')" title="Yes">&#10003;</button>
+            <button class="check-btn no" onclick="toggle(this,'no')" title="No">&#10007;</button>
+          </div>
+        </div>
+      </li>
     </ul>
 
-    <div class="section-header" style="margin-top:20px;">Notes / Coaching Points</div>
-    <div class="field-group" style="margin-top:8px;">
-      <textarea class="notes-area" id="notes" placeholder="Add any coaching notes or observations here..."></textarea>
+    <!-- Flags -->
+    <div class="section-title" style="margin-top: 22px;">Red Flags <span class="count">Mark any that happened</span></div>
+    <ul class="flag-list" id="did-not-list">
+      <li data-item="Replied right off that the car is sold">
+        <span class="item-label">Replied right off that the car is sold</span>
+        <button class="check-btn flag" onclick="toggle(this,'flag')">Flag</button>
+      </li>
+      <li data-item="Told them we'll check and call back">
+        <span class="item-label">Told them we'll check and call back</span>
+        <button class="check-btn flag" onclick="toggle(this,'flag')">Flag</button>
+      </li>
+      <li data-item="Told them it's at another store">
+        <span class="item-label">Told them it's at another store</span>
+        <button class="check-btn flag" onclick="toggle(this,'flag')">Flag</button>
+      </li>
+    </ul>
+
+    <!-- Notes -->
+    <div class="section-title" style="margin-top: 18px;">Notes &amp; Coaching</div>
+    <div class="notes-wrap">
+      <textarea class="notes-area" id="notes" placeholder="Add coaching notes or observations..."></textarea>
     </div>
   </div>
 
   <div class="step-indicator">
-    <div class="step"><b>How it works:</b> Click the green button below. It downloads a polished PDF scorecard and opens Gmail with the BCC already set. Just add the recipient, drag in the PDF, and send.</div>
+    <b>How it works:</b> Click the blue button below. It downloads a polished PDF scorecard and opens Gmail with the BCC already set. Add the recipient, drag in the PDF, and send.
   </div>
 
   <div class="bcc-reminder">
-    <strong>Auto-BCC:</strong> Gmail will open with <strong>lreynes@anderson-auto.net</strong> and <strong>lsneed@anderson-auto.net</strong> already in BCC.
+    <strong>Auto-BCC:</strong> Gmail will open with <strong>lreynes@anderson-auto.net</strong> already in BCC.
   </div>
 
   <div class="actions">
-    <button class="btn btn-primary" onclick="sendScorecard()">&#9993; Download PDF &amp; Open Gmail</button>
-    <button class="btn btn-pdf" onclick="downloadPDFOnly()">&#128196; PDF Only</button>
-    <button class="btn btn-secondary" onclick="resetForm()">&#8635; Reset</button>
+    <button class="btn btn-primary" onclick="sendScorecard()">&#9993;&nbsp;&nbsp;Download PDF &amp; Open Gmail</button>
+    <button class="btn btn-pdf" onclick="downloadPDFOnly()">&#128196;&nbsp;&nbsp;PDF Only</button>
+    <button class="btn btn-secondary" onclick="resetForm()">&#8635;&nbsp;&nbsp;Reset</button>
   </div>
 </div>
 
@@ -207,12 +568,51 @@
   document.getElementById('call_date').valueAsDate = new Date();
 
   function toggle(btn, type) {
-    const parent = btn.closest('.check-btns');
+    const parent = btn.closest('.check-btns') || btn.parentElement;
     if (type === 'flag') { btn.classList.toggle('active'); return; }
+    const li = btn.closest('li');
     const btns = parent.querySelectorAll('.check-btn');
     const wasActive = btn.classList.contains('active');
     btns.forEach(b => b.classList.remove('active'));
-    if (!wasActive) btn.classList.add('active');
+    li.classList.remove('active-yes', 'active-no');
+    if (!wasActive) {
+      btn.classList.add('active');
+      li.classList.add(type === 'yes' ? 'active-yes' : 'active-no');
+    }
+  }
+
+  function setAppt(val) {
+    const card = document.getElementById('appt-card');
+    const yes = document.getElementById('appt-yes');
+    const no  = document.getElementById('appt-no');
+    const banner = document.getElementById('miss-banner');
+    const status = document.getElementById('appt-status');
+
+    const alreadyActive = (val === 'yes' && yes.classList.contains('active')) ||
+                          (val === 'no'  && no.classList.contains('active'));
+
+    yes.classList.remove('active');
+    no.classList.remove('active');
+    card.classList.remove('missed');
+    banner.classList.remove('show');
+
+    if (alreadyActive) { status.textContent = 'Not Scored'; return; }
+
+    if (val === 'yes') {
+      yes.classList.add('active');
+      status.textContent = 'Asked \u2713';
+    } else {
+      no.classList.add('active');
+      card.classList.add('missed');
+      banner.classList.add('show');
+      status.textContent = 'MISSED';
+    }
+  }
+
+  function getApptStatus() {
+    if (document.getElementById('appt-yes').classList.contains('active')) return 'YES';
+    if (document.getElementById('appt-no').classList.contains('active'))  return 'NO';
+    return '--';
   }
 
   function getFormData() {
@@ -223,16 +623,18 @@
     const reviewer = document.getElementById('reviewer').value || '';
     const notes = document.getElementById('notes').value || '';
 
-    const didWe = [];
-    document.querySelectorAll('#did-we-list li').forEach(li => {
+    const stages = [];
+    document.querySelectorAll('.checklist li').forEach(li => {
       const label = li.dataset.item;
       const yesBtn = li.querySelector('.check-btn.yes');
       const noBtn = li.querySelector('.check-btn.no');
       let status = '--';
       if (yesBtn && yesBtn.classList.contains('active')) status = 'YES';
       if (noBtn && noBtn.classList.contains('active')) status = 'NO';
-      didWe.push({ label, status });
+      stages.push({ label, status });
     });
+
+    const appt = getApptStatus();
 
     const didNot = [];
     document.querySelectorAll('#did-not-list li').forEach(li => {
@@ -242,217 +644,269 @@
       didNot.push({ label, flagged });
     });
 
-    return { rep, phone, link, date, reviewer, notes, didWe, didNot };
+    return { rep, phone, link, date, reviewer, notes, stages, appt, didNot };
   }
 
   function generatePDF() {
     const d = getFormData();
     const doc = new jsPDF({ unit: 'pt', format: 'letter' });
     const W = 612, H = 792;
-    const M = 50; // margin
-    let y = 45;
+    const M = 48;
+    let y = 0;
 
-    // --- HEADER BAR ---
-    doc.setFillColor(26, 26, 46);
-    doc.rect(0, 0, W, 70, 'F');
-    doc.setFontSize(22);
-    doc.setTextColor(255, 255, 255);
+    // Header bar (navy)
+    doc.setFillColor(46, 89, 120);
+    doc.rect(0, 0, W, 72, 'F');
     doc.setFont('helvetica', 'bold');
-    doc.text('Inbound Sales Call', W / 2, 38, { align: 'center' });
     doc.setFontSize(10);
-    doc.setTextColor(180, 180, 200);
-    doc.text('Anderson Automotive Group  \u2022  Call Scorecard', W / 2, 56, { align: 'center' });
+    doc.setTextColor(180, 210, 230);
+    doc.text('ANDERSON AUTOMOTIVE GROUP', W / 2, 28, { align: 'center' });
+    doc.setFontSize(20);
+    doc.setTextColor(255, 255, 255);
+    doc.text('Inbound Sales Call Scorecard', W / 2, 52, { align: 'center' });
 
-    // Red accent line
-    doc.setFillColor(192, 57, 43);
-    doc.rect(0, 70, W, 4, 'F');
+    y = 96;
 
-    y = 100;
-
-    // --- INFO SECTION ---
-    const drawInfoRow = (label, value, x, yPos, maxW) => {
+    const drawInfo = (label, value, x, yPos, maxW) => {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(8);
-      doc.setTextColor(140, 140, 140);
+      doc.setTextColor(138, 148, 160);
       doc.text(label.toUpperCase(), x, yPos);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
-      doc.setTextColor(45, 45, 45);
-      doc.text(value || '—', x, yPos + 14, { maxWidth: maxW || 200 });
+      doc.setTextColor(31, 41, 55);
+      doc.text(value || '-', x, yPos + 14, { maxWidth: maxW || 220 });
     };
+    drawInfo('Rep Name', d.rep, M, y, 220);
+    drawInfo('Customer Phone', d.phone, 316, y, 220);
+    y += 34;
+    drawInfo('Date', d.date, M, y, 220);
+    drawInfo('Reviewed By', d.reviewer, 316, y, 220);
+    y += 34;
 
-    drawInfoRow('Rep Name', d.rep, M, y, 200);
-    drawInfoRow('Customer Phone', d.phone, 300, y, 200);
-    y += 36;
-    drawInfoRow('Date', d.date, M, y, 200);
-    drawInfoRow('Reviewed By', d.reviewer, 300, y, 200);
-    y += 36;
-
-    // CarWars link - show truncated with "see below" note
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(8);
-    doc.setTextColor(140, 140, 140);
+    doc.setTextColor(138, 148, 160);
     doc.text('CARWARS CALL LINK', M, y);
     if (d.link) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.setTextColor(52, 152, 219);
-      doc.textWithLink('Click here to listen to this call on CarWars', M, y + 14, { url: d.link });
+      doc.setTextColor(46, 89, 120);
+      doc.textWithLink('Click here to listen on CarWars', M, y + 14, { url: d.link });
     } else {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
-      doc.setTextColor(45, 45, 45);
-      doc.text('—', M, y + 14);
+      doc.setTextColor(31, 41, 55);
+      doc.text('-', M, y + 14);
     }
-    y += 32;
+    y += 30;
 
-    // --- DID WE SECTION ---
-    doc.setFillColor(39, 174, 96);
-    doc.circle(M + 4, y + 3, 4, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(45, 45, 45);
-    doc.text('Did we:', M + 14, y + 7);
+    const sectionTitle = (text) => {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(46, 89, 120);
+      doc.text(text.toUpperCase(), M, y);
+      doc.setDrawColor(46, 89, 120);
+      doc.setLineWidth(1.5);
+      doc.line(M, y + 4, W - M, y + 4);
+      y += 16;
+    };
 
-    // Column headers
-    doc.setFontSize(10);
-    doc.setTextColor(100, 100, 100);
-    doc.text('\u2713', W - M - 55, y + 7);
-    doc.text('\u2717', W - M - 22, y + 7);
-    y += 18;
+    const preAsk = d.stages.slice(0, 5);
+    const postAsk = d.stages.slice(5);
 
-    const rowH = 28;
-    d.didWe.forEach((item, i) => {
-      // Alternating row bg
-      if (i % 2 === 0) {
-        doc.setFillColor(248, 249, 250);
-        doc.rect(M, y - 2, W - 2 * M, rowH, 'F');
-      }
-      // Green left bar
-      doc.setFillColor(39, 174, 96);
-      doc.rect(M, y - 2, 4, rowH, 'F');
+    sectionTitle('Call Stages');
 
-      // Label
+    const drawStageRow = (item) => {
+      const rowH = 28;
+      // Blue tab (mirrors the guide)
+      doc.setFillColor(46, 89, 120);
+      doc.rect(M, y, 12, rowH, 'F');
+      // Row bg
+      doc.setFillColor(252, 253, 254);
+      doc.rect(M + 12, y, W - 2 * M - 12, rowH, 'F');
+      doc.setDrawColor(227, 232, 238);
+      doc.setLineWidth(0.5);
+      doc.rect(M + 12, y, W - 2 * M - 12, rowH, 'S');
+
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
-      doc.setTextColor(45, 45, 45);
-      doc.text(item.label, M + 14, y + 14);
+      doc.setTextColor(31, 41, 55);
+      doc.text(item.label, M + 22, y + 18);
 
-      // Check/X markers
       const checkX = W - M - 58;
-      const crossX = W - M - 25;
-      const markerY = y + 4;
+      const crossX = W - M - 28;
+      const markerY = y + 6;
       const boxSize = 16;
 
       if (item.status === 'YES') {
-        doc.setFillColor(39, 174, 96);
+        doc.setFillColor(47, 133, 90);
         doc.roundedRect(checkX, markerY, boxSize, boxSize, 3, 3, 'F');
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text('\u2713', checkX + 3, markerY + 12);
+        doc.setFontSize(12);
+        doc.text('\u2713', checkX + 3.5, markerY + 12);
       } else {
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
+        doc.setDrawColor(200, 208, 216);
+        doc.setLineWidth(0.7);
         doc.roundedRect(checkX, markerY, boxSize, boxSize, 3, 3, 'S');
       }
-
       if (item.status === 'NO') {
-        doc.setFillColor(231, 76, 60);
+        doc.setFillColor(210, 58, 58);
         doc.roundedRect(crossX, markerY, boxSize, boxSize, 3, 3, 'F');
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(12);
         doc.setFont('helvetica', 'bold');
-        doc.text('\u2717', crossX + 3, markerY + 12);
+        doc.setFontSize(12);
+        doc.text('\u2717', crossX + 3.5, markerY + 12);
       } else {
-        doc.setDrawColor(200, 200, 200);
-        doc.setLineWidth(0.5);
+        doc.setDrawColor(200, 208, 216);
+        doc.setLineWidth(0.7);
         doc.roundedRect(crossX, markerY, boxSize, boxSize, 3, 3, 'S');
       }
 
-      // Subtle bottom line
-      doc.setDrawColor(230, 230, 230);
-      doc.setLineWidth(0.3);
-      doc.line(M, y + rowH - 2, W - M, y + rowH - 2);
+      y += rowH + 4;
+    };
 
-      y += rowH;
-    });
+    preAsk.forEach(drawStageRow);
 
-    y += 16;
+    // APPOINTMENT ASK big block
+    y += 6;
+    const asked = d.appt === 'YES';
+    const missed = d.appt === 'NO';
+    const askBoxH = 92;
 
-    // --- WE DID NOT SECTION ---
-    doc.setFillColor(192, 57, 43);
-    doc.circle(M + 4, y + 3, 4, 'F');
+    if (missed) {
+      doc.setFillColor(253, 236, 236);
+      doc.setDrawColor(210, 58, 58);
+    } else {
+      doc.setFillColor(252, 253, 254);
+      doc.setDrawColor(46, 89, 120);
+    }
+    doc.setLineWidth(2);
+    doc.roundedRect(M, y, W - 2 * M, askBoxH, 8, 8, 'FD');
+
+    const tabH = 22;
+    if (missed) doc.setFillColor(210, 58, 58);
+    else doc.setFillColor(46, 89, 120);
+    doc.roundedRect(M, y, W - 2 * M, tabH, 8, 8, 'F');
+    doc.rect(M, y + tabH - 8, W - 2 * M, 8, 'F');
+
     doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(45, 45, 45);
-    doc.text('We did not:', M + 14, y + 7);
-    y += 18;
+    doc.setFontSize(11);
+    doc.setTextColor(255, 255, 255);
+    doc.text('\u2605 APPOINTMENT ASK', M + 14, y + 15);
 
-    d.didNot.forEach((item, i) => {
-      if (i % 2 === 0) {
-        doc.setFillColor(248, 249, 250);
-        doc.rect(M, y - 2, W - 2 * M, rowH, 'F');
-      }
-      // Red left bar
-      doc.setFillColor(192, 57, 43);
-      doc.rect(M, y - 2, 4, rowH, 'F');
+    const pillText = asked ? 'ASKED' : (missed ? 'MISSED' : 'NOT SCORED');
+    doc.setFontSize(9);
+    const pw = doc.getTextWidth(pillText) + 16;
+    doc.setDrawColor(255, 255, 255);
+    doc.setLineWidth(0.8);
+    doc.roundedRect(W - M - 12 - pw, y + 5, pw, 13, 6, 6, 'S');
+    doc.setFont('helvetica', 'bold');
+    doc.setFontSize(9);
+    doc.setTextColor(255, 255, 255);
+    doc.text(pillText, W - M - 12 - pw + 8, y + 14);
 
+    const bodyY = y + tabH;
+    if (missed) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(54);
+      doc.setTextColor(210, 58, 58);
+      doc.text('\u2717', M + 24, bodyY + 54);
+
+      doc.setFontSize(15);
+      doc.setTextColor(176, 40, 40);
+      doc.text('MISSED APPOINTMENT ASK', M + 92, bodyY + 28);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.5);
+      doc.setTextColor(80, 40, 40);
+      const msg = 'No appointment was requested on this call. This is a critical coaching moment - address it with the rep today.';
+      const lines = doc.splitTextToSize(msg, W - 2 * M - 110);
+      doc.text(lines, M + 92, bodyY + 44);
+    } else if (asked) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(40);
+      doc.setTextColor(47, 133, 90);
+      doc.text('\u2713', M + 28, bodyY + 50);
+
+      doc.setFontSize(15);
+      doc.setTextColor(31, 41, 55);
+      doc.text('Did the rep ask for the appointment?', M + 92, bodyY + 28);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(47, 133, 90);
+      doc.text('Yes - appointment was requested.', M + 92, bodyY + 48);
+    } else {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(15);
+      doc.setTextColor(31, 41, 55);
+      doc.text('Did the rep ask for the appointment?', M + 14, bodyY + 28);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
-      doc.setTextColor(45, 45, 45);
-      doc.text(item.label, M + 14, y + 14);
+      doc.setTextColor(138, 148, 160);
+      doc.text('Not scored on this review.', M + 14, bodyY + 48);
+    }
 
-      // Flag indicator
-      const flagX = W - M - 60;
+    y += askBoxH + 14;
+
+    postAsk.forEach(drawStageRow);
+
+    y += 10;
+
+    sectionTitle('Red Flags');
+    d.didNot.forEach(item => {
+      const rowH = 24;
+      doc.setFillColor(item.flagged ? 253 : 252, item.flagged ? 236 : 253, item.flagged ? 236 : 254);
+      doc.rect(M, y, W - 2 * M, rowH, 'F');
+      doc.setDrawColor(item.flagged ? 210 : 227, item.flagged ? 58 : 232, item.flagged ? 58 : 238);
+      doc.setLineWidth(0.5);
+      doc.rect(M, y, W - 2 * M, rowH, 'S');
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10.5);
+      doc.setTextColor(item.flagged ? 176 : 75, item.flagged ? 40 : 85, item.flagged ? 40 : 99);
+      doc.text(item.label, M + 10, y + 16);
+
+      const pillW = 56;
       if (item.flagged) {
-        doc.setFillColor(231, 76, 60);
-        doc.roundedRect(flagX, y + 2, 50, 18, 3, 3, 'F');
+        doc.setFillColor(210, 58, 58);
+        doc.roundedRect(W - M - pillW - 6, y + 5, pillW, 14, 3, 3, 'F');
         doc.setTextColor(255, 255, 255);
-        doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
-        doc.text('FLAGGED', flagX + 5, y + 14);
+        doc.setFontSize(9);
+        doc.text('FLAGGED', W - M - pillW - 6 + 8, y + 15);
       } else {
-        doc.setFillColor(230, 245, 230);
-        doc.roundedRect(flagX, y + 2, 50, 18, 3, 3, 'F');
-        doc.setTextColor(39, 174, 96);
-        doc.setFontSize(9);
+        doc.setDrawColor(200, 208, 216);
+        doc.setLineWidth(0.7);
+        doc.roundedRect(W - M - pillW - 6, y + 5, pillW, 14, 3, 3, 'S');
+        doc.setTextColor(150, 160, 172);
         doc.setFont('helvetica', 'bold');
-        doc.text('OK', flagX + 18, y + 14);
+        doc.setFontSize(9);
+        doc.text('OK', W - M - pillW - 6 + 22, y + 15);
       }
 
-      doc.setDrawColor(230, 230, 230);
-      doc.setLineWidth(0.3);
-      doc.line(M, y + rowH - 2, W - M, y + rowH - 2);
-
-      y += rowH;
+      y += rowH + 3;
     });
 
-    y += 16;
+    y += 10;
 
-    // --- NOTES ---
-    doc.setFillColor(39, 174, 96);
-    doc.circle(M + 4, y + 3, 4, 'F');
-    doc.setFont('helvetica', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(45, 45, 45);
-    doc.text('Notes / Coaching Points', M + 14, y + 7);
-    y += 14;
-
-    doc.setFillColor(248, 249, 250);
-    doc.roundedRect(M, y, W - 2 * M, 70, 4, 4, 'F');
+    sectionTitle('Notes & Coaching');
+    const notesH = 76;
+    doc.setFillColor(252, 253, 254);
+    doc.setDrawColor(227, 232, 238);
+    doc.setLineWidth(0.5);
+    doc.roundedRect(M, y, W - 2 * M, notesH, 4, 4, 'FD');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(10);
-    doc.setTextColor(60, 60, 60);
+    doc.setTextColor(60, 70, 85);
     const noteLines = doc.splitTextToSize(d.notes || '(none)', W - 2 * M - 20);
     doc.text(noteLines, M + 10, y + 16);
+    y += notesH + 14;
 
-    y += 80;
-
-    // --- FOOTER ---
-    doc.setFontSize(7);
-    doc.setTextColor(170, 170, 170);
-    doc.text('Anderson Automotive Group \u2022 Inbound Sales Call Scorecard', W / 2, H - 25, { align: 'center' });
+    doc.setFont('helvetica', 'italic');
+    doc.setFontSize(7.5);
+    doc.setTextColor(150, 160, 172);
+    doc.text('Anderson Automotive Group  \u2022  Inbound Sales Call Scorecard', W / 2, H - 24, { align: 'center' });
 
     return doc;
   }
@@ -467,22 +921,17 @@
     const d = getFormData();
     if (!d.rep) { showToast('Please enter the rep name first'); return; }
 
-    // 1. Generate and download PDF
     const doc = generatePDF();
     doc.save(getFilename());
 
-    // 2. Open Gmail compose with short body + BCC
     const rep = d.rep || 'Rep';
     const subject = encodeURIComponent(`Inbound Sales Call Scorecard - ${rep}`);
-    const bodyText = `Hi,\n\nAttached is the Inbound Sales Call Scorecard for ${rep}.\n\nThe CarWars call link is in the PDF — just click it to listen.\n\nBest regards`;
+    const bodyText = `Hi,\n\nAttached is the Inbound Sales Call Scorecard for ${rep}.\n\nThe CarWars call link is in the PDF - just click it to listen.\n\nBest regards`;
     const body = encodeURIComponent(bodyText);
-    const bcc = encodeURIComponent('lreynes@anderson-auto.net,lsneed@anderson-auto.net');
+    const bcc = encodeURIComponent('lreynes@anderson-auto.net');
     const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}&bcc=${bcc}`;
 
-    setTimeout(() => {
-      window.open(gmailUrl, '_blank');
-    }, 500);
-
+    setTimeout(() => { window.open(gmailUrl, '_blank'); }, 500);
     showToast('PDF downloaded! Drag it into the Gmail window to attach.');
   }
 
@@ -501,6 +950,11 @@
       else el.value = '';
     });
     document.querySelectorAll('.check-btn.active').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.checklist li').forEach(li => li.classList.remove('active-yes', 'active-no'));
+    document.querySelectorAll('.appt-choice').forEach(b => b.classList.remove('active'));
+    document.getElementById('appt-card').classList.remove('missed');
+    document.getElementById('miss-banner').classList.remove('show');
+    document.getElementById('appt-status').textContent = 'Not Scored';
     showToast('Form cleared');
   }
 
