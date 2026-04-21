@@ -7,12 +7,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --navy:    #2E5978;
-    --navy-2:  #3B6B8F;
-    --navy-3:  #1E3F57;
+    --navy:    #5A87AA;
+    --navy-2:  #4A7A9E;
+    --navy-3:  #3C6A8B;
     --ink:     #1F2937;
     --ink-2:   #4B5563;
     --muted:   #8A94A0;
@@ -29,11 +29,11 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { -webkit-font-smoothing: antialiased; }
   body {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Mulish', 'Proxima Nova', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: var(--bg);
     color: var(--ink);
-    padding: 24px 16px 60px;
-    line-height: 1.4;
+    padding: 16px 14px 32px;
+    line-height: 1.35;
   }
   .container {
     max-width: 760px;
@@ -47,49 +47,49 @@
 
   /* Header */
   .header {
-    padding: 30px 36px 18px;
+    padding: 18px 28px 12px;
     border-bottom: 1px solid var(--line);
   }
   .header .eyebrow {
-    font-size: 11px;
+    font-size: 10px;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--navy);
-    font-weight: 700;
-    margin-bottom: 8px;
-  }
-  .header h1 {
-    font-size: 28px;
     font-weight: 800;
-    color: var(--ink);
-    letter-spacing: -0.5px;
     margin-bottom: 4px;
   }
+  .header h1 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--ink);
+    letter-spacing: -0.4px;
+    margin-bottom: 2px;
+  }
   .header .subtitle {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--ink-2);
   }
-  .header .subtitle strong { color: var(--navy); font-weight: 700; }
+  .header .subtitle strong { color: var(--navy); font-weight: 800; }
 
-  .form-body { padding: 22px 36px 8px; }
+  .form-body { padding: 14px 28px 4px; }
 
   /* Info grid */
   .info-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 14px 18px;
-    margin-bottom: 22px;
+    gap: 8px 14px;
+    margin-bottom: 12px;
   }
   .info-grid .full-width { grid-column: 1 / -1; }
   .field-group label {
-    display: block; font-size: 10.5px; font-weight: 700;
+    display: block; font-size: 10px; font-weight: 800;
     text-transform: uppercase; letter-spacing: 1px;
-    color: var(--muted); margin-bottom: 6px;
+    color: var(--muted); margin-bottom: 3px;
   }
   .field-group input, .field-group textarea {
-    width: 100%; padding: 10px 12px;
-    border: 1px solid var(--line); border-radius: 6px;
-    font-size: 14px; color: var(--ink);
+    width: 100%; padding: 7px 10px;
+    border: 1px solid var(--line); border-radius: 5px;
+    font-size: 13px; color: var(--ink);
     font-family: inherit; background: #FCFDFE;
     transition: border-color 0.15s, box-shadow 0.15s;
   }
@@ -101,18 +101,18 @@
 
   /* Section header */
   .section-title {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 800;
     letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--navy);
-    margin: 10px 0 10px;
-    padding-bottom: 6px;
+    margin: 4px 0 6px;
+    padding-bottom: 4px;
     border-bottom: 2px solid var(--navy);
     display: flex; align-items: center; gap: 10px;
   }
   .section-title .count {
-    font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: none;
+    font-size: 10px; color: var(--muted); font-weight: 600; letter-spacing: 0.5px; text-transform: none;
   }
 
   /* Stage rows with blue side tabs (mirrors the guide) */
@@ -120,8 +120,8 @@
   .checklist li {
     display: flex; align-items: stretch;
     border: 1px solid var(--line);
-    border-radius: 6px;
-    margin-bottom: 8px;
+    border-radius: 5px;
+    margin-bottom: 4px;
     overflow: hidden;
     background: #fff;
     transition: border-color 0.15s, background 0.15s;
@@ -129,15 +129,15 @@
   .checklist li:hover { border-color: #C7D3DD; }
 
   .item-tab {
-    width: 82px;
-    min-width: 82px;
+    width: 72px;
+    min-width: 72px;
     background: var(--navy);
     color: #fff;
     display: flex; align-items: center; justify-content: center;
-    padding: 10px 6px;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 1px;
+    padding: 6px 4px;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
     text-align: center;
     line-height: 1.15;
@@ -148,19 +148,19 @@
   .item-body {
     flex: 1;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 12px 14px 12px 16px;
-    gap: 14px;
+    padding: 7px 10px 7px 12px;
+    gap: 12px;
   }
   .item-body .item-label {
-    font-size: 14px; color: var(--ink); font-weight: 500;
+    font-size: 13px; color: var(--ink); font-weight: 600;
   }
   .item-body .item-hint {
-    display: block; font-size: 11.5px; color: var(--muted); font-weight: 400; margin-top: 2px;
+    display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px;
   }
-  .check-btns { display: flex; gap: 6px; flex-shrink: 0; }
+  .check-btns { display: flex; gap: 5px; flex-shrink: 0; }
   .check-btn {
-    width: 38px; height: 38px; border: 1.5px solid var(--line); border-radius: 6px;
-    background: #fff; cursor: pointer; font-size: 18px;
+    width: 32px; height: 32px; border: 1.5px solid var(--line); border-radius: 5px;
+    background: #fff; cursor: pointer; font-size: 16px;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.15s; color: #BAC3CD;
   }
@@ -170,9 +170,9 @@
 
   /* APPOINTMENT ASK — huge standalone card */
   .appt-card {
-    margin: 22px 0 18px;
+    margin: 12px 0 10px;
     border: 2px solid var(--navy);
-    border-radius: 10px;
+    border-radius: 8px;
     background: linear-gradient(180deg, #FFFFFF 0%, #F7FAFC 100%);
     overflow: hidden;
     position: relative;
@@ -181,55 +181,56 @@
   .appt-card .appt-tab {
     background: var(--navy);
     color: #fff;
-    padding: 10px 22px;
-    font-size: 12px;
+    padding: 7px 16px;
+    font-size: 11px;
     font-weight: 800;
-    letter-spacing: 2.5px;
+    letter-spacing: 2px;
     text-transform: uppercase;
     display: flex; align-items: center; justify-content: space-between;
     transition: background 0.2s;
   }
   .appt-card .appt-tab .status-pill {
-    font-size: 10.5px; letter-spacing: 1px; padding: 3px 10px; border-radius: 999px;
+    font-size: 10px; letter-spacing: 1px; padding: 2px 9px; border-radius: 999px;
     background: rgba(255,255,255,0.18); font-weight: 700;
   }
-  .appt-body { padding: 26px 26px 22px; text-align: center; }
+  .appt-body { padding: 14px 18px 14px; text-align: center; }
   .appt-body h2 {
-    font-size: 26px;
+    font-size: 18px;
     font-weight: 800;
     color: var(--ink);
-    letter-spacing: -0.5px;
-    margin-bottom: 6px;
+    letter-spacing: -0.4px;
+    margin-bottom: 4px;
   }
   .appt-body .appt-sub {
-    font-size: 13px; color: var(--ink-2); margin-bottom: 20px;
+    font-size: 12px; color: var(--ink-2); margin-bottom: 10px;
     max-width: 420px; margin-left: auto; margin-right: auto;
   }
   .appt-body .appt-sub .highlight {
-    background: var(--highlight); padding: 1px 6px; border-radius: 3px;
+    background: var(--highlight); padding: 1px 5px; border-radius: 3px;
   }
-  .appt-choices { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+  .appt-choices { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
   .appt-choice {
-    flex: 1; min-width: 180px; max-width: 240px;
-    padding: 22px 16px;
+    flex: 1; min-width: 160px; max-width: 220px;
+    padding: 12px 12px;
     border: 2px solid var(--line);
-    border-radius: 10px;
+    border-radius: 8px;
     background: #fff;
     cursor: pointer;
     font-family: inherit;
     transition: all 0.15s;
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    display: flex; flex-direction: row; align-items: center; gap: 10px; justify-content: center;
   }
   .appt-choice:hover { border-color: #9AAEC1; transform: translateY(-1px); }
   .appt-choice .big-mark {
-    width: 54px; height: 54px; border-radius: 50%;
+    width: 34px; height: 34px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
-    font-size: 30px; font-weight: 700; color: #BAC3CD;
-    border: 2.5px solid var(--line);
+    font-size: 20px; font-weight: 700; color: #BAC3CD;
+    border: 2px solid var(--line);
     transition: all 0.15s;
+    flex-shrink: 0;
   }
   .appt-choice .choice-label {
-    font-size: 14px; font-weight: 700; color: var(--ink-2); letter-spacing: 1px; text-transform: uppercase;
+    font-size: 12px; font-weight: 800; color: var(--ink-2); letter-spacing: 0.8px; text-transform: uppercase;
   }
   .appt-choice.yes.active { border-color: var(--ok); background: var(--ok-soft); }
   .appt-choice.yes.active .big-mark { background: var(--ok); border-color: var(--ok); color: #fff; }
@@ -241,28 +242,28 @@
   /* Giant red X banner when the appt ask is missed */
   .miss-banner {
     display: none;
-    margin-top: 22px;
-    padding: 24px 20px;
+    margin-top: 12px;
+    padding: 14px 16px;
     background: var(--bad);
     color: #fff;
-    border-radius: 10px;
+    border-radius: 8px;
     text-align: center;
-    align-items: center; justify-content: center; gap: 18px;
-    box-shadow: 0 6px 20px rgba(210,58,58,0.25);
+    align-items: center; justify-content: center; gap: 14px;
+    box-shadow: 0 4px 14px rgba(210,58,58,0.22);
   }
   .miss-banner.show { display: flex; }
   .miss-banner .giant-x {
-    font-size: 72px;
+    font-size: 52px;
     line-height: 1;
     font-weight: 900;
     flex-shrink: 0;
   }
   .miss-banner .miss-copy { text-align: left; }
   .miss-banner .miss-title {
-    font-size: 18px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 4px;
+    font-size: 15px; font-weight: 800; letter-spacing: 0.5px; margin-bottom: 2px;
   }
   .miss-banner .miss-desc {
-    font-size: 13px; opacity: 0.92; max-width: 380px; line-height: 1.45;
+    font-size: 12px; opacity: 0.92; max-width: 380px; line-height: 1.4;
   }
   .appt-card.missed {
     border-color: var(--bad);
@@ -272,25 +273,25 @@
   .appt-card.missed .appt-tab { background: var(--bad); }
 
   /* Flags */
-  .flag-list { list-style: none; margin-bottom: 6px; }
+  .flag-list { list-style: none; margin-bottom: 4px; }
   .flag-list li {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 10px 14px; border: 1px solid var(--line); border-radius: 6px;
-    margin-bottom: 6px; background: #fff; font-size: 13.5px; color: var(--ink-2);
+    padding: 6px 12px; border: 1px solid var(--line); border-radius: 5px;
+    margin-bottom: 4px; background: #fff; font-size: 12.5px; color: var(--ink-2);
   }
   .flag-list li .item-label { flex: 1; }
   .check-btn.flag {
-    width: auto; padding: 0 14px; font-size: 12px; font-weight: 700; height: 32px;
+    width: auto; padding: 0 12px; font-size: 11px; font-weight: 800; height: 28px;
     letter-spacing: 0.5px; text-transform: uppercase;
   }
   .check-btn.flag.active { background: var(--bad); border-color: var(--bad); color: #fff; }
 
   /* Notes */
-  .notes-wrap { margin-top: 14px; }
+  .notes-wrap { margin-top: 6px; }
   .notes-area {
-    width: 100%; min-height: 90px; resize: vertical;
-    padding: 12px; border: 1px solid var(--line); border-radius: 6px;
-    font-size: 13.5px; color: var(--ink); font-family: inherit;
+    width: 100%; min-height: 56px; resize: vertical;
+    padding: 8px 10px; border: 1px solid var(--line); border-radius: 5px;
+    font-size: 12.5px; color: var(--ink); font-family: inherit;
     background: #FCFDFE;
   }
   .notes-area:focus {
@@ -301,25 +302,25 @@
   /* Footer */
   .bcc-reminder {
     background: #F1F6FA; border-left: 3px solid var(--navy);
-    padding: 12px 16px; margin: 4px 36px 12px;
-    font-size: 12px; color: var(--ink-2); line-height: 1.5; border-radius: 4px;
+    padding: 8px 14px; margin: 4px 28px 6px;
+    font-size: 11.5px; color: var(--ink-2); line-height: 1.4; border-radius: 4px;
   }
   .bcc-reminder strong { color: var(--navy); }
 
   .step-indicator {
-    background: #FCFDFE; border: 1px solid var(--line); border-radius: 6px;
-    padding: 12px 14px; margin: 4px 36px 12px;
-    font-size: 12.5px; line-height: 1.5; color: var(--ink-2);
+    background: #FCFDFE; border: 1px solid var(--line); border-radius: 5px;
+    padding: 8px 12px; margin: 4px 28px 6px;
+    font-size: 11.5px; line-height: 1.4; color: var(--ink-2);
   }
   .step-indicator b { color: var(--navy); }
 
   .actions {
-    padding: 16px 36px 30px;
-    display: flex; gap: 10px; flex-wrap: wrap;
+    padding: 10px 28px 18px;
+    display: flex; gap: 8px; flex-wrap: wrap;
   }
   .btn {
-    padding: 13px 22px; border: none; border-radius: 6px;
-    font-size: 14px; font-weight: 700; cursor: pointer;
+    padding: 10px 18px; border: none; border-radius: 5px;
+    font-size: 13px; font-weight: 800; cursor: pointer;
     transition: all 0.15s; display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     font-family: inherit; letter-spacing: 0.2px;
   }
@@ -522,7 +523,7 @@
     </ul>
 
     <!-- Flags -->
-    <div class="section-title" style="margin-top: 22px;">Red Flags <span class="count">Mark any that happened</span></div>
+    <div class="section-title" style="margin-top: 10px;">Red Flags <span class="count">Mark any that happened</span></div>
     <ul class="flag-list" id="did-not-list">
       <li data-item="Replied right off that the car is sold">
         <span class="item-label">Replied right off that the car is sold</span>
@@ -539,7 +540,7 @@
     </ul>
 
     <!-- Notes -->
-    <div class="section-title" style="margin-top: 18px;">Notes &amp; Coaching</div>
+    <div class="section-title" style="margin-top: 8px;">Notes &amp; Coaching</div>
     <div class="notes-wrap">
       <textarea class="notes-area" id="notes" placeholder="Add coaching notes or observations..."></textarea>
     </div>
@@ -655,11 +656,11 @@
     let y = 0;
 
     // Header bar (navy)
-    doc.setFillColor(46, 89, 120);
+    doc.setFillColor(90, 135, 170);
     doc.rect(0, 0, W, 72, 'F');
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(10);
-    doc.setTextColor(180, 210, 230);
+    doc.setTextColor(220, 232, 244);
     doc.text('ANDERSON AUTOMOTIVE GROUP', W / 2, 28, { align: 'center' });
     doc.setFontSize(20);
     doc.setTextColor(255, 255, 255);
@@ -691,7 +692,7 @@
     if (d.link) {
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.setTextColor(46, 89, 120);
+      doc.setTextColor(90, 135, 170);
       doc.textWithLink('Click here to listen on CarWars', M, y + 14, { url: d.link });
     } else {
       doc.setFont('helvetica', 'normal');
@@ -704,9 +705,9 @@
     const sectionTitle = (text) => {
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(11);
-      doc.setTextColor(46, 89, 120);
+      doc.setTextColor(90, 135, 170);
       doc.text(text.toUpperCase(), M, y);
-      doc.setDrawColor(46, 89, 120);
+      doc.setDrawColor(90, 135, 170);
       doc.setLineWidth(1.5);
       doc.line(M, y + 4, W - M, y + 4);
       y += 16;
@@ -720,7 +721,7 @@
     const drawStageRow = (item) => {
       const rowH = 28;
       // Blue tab (mirrors the guide)
-      doc.setFillColor(46, 89, 120);
+      doc.setFillColor(90, 135, 170);
       doc.rect(M, y, 12, rowH, 'F');
       // Row bg
       doc.setFillColor(252, 253, 254);
@@ -780,14 +781,14 @@
       doc.setDrawColor(210, 58, 58);
     } else {
       doc.setFillColor(252, 253, 254);
-      doc.setDrawColor(46, 89, 120);
+      doc.setDrawColor(90, 135, 170);
     }
     doc.setLineWidth(2);
     doc.roundedRect(M, y, W - 2 * M, askBoxH, 8, 8, 'FD');
 
     const tabH = 22;
     if (missed) doc.setFillColor(210, 58, 58);
-    else doc.setFillColor(46, 89, 120);
+    else doc.setFillColor(90, 135, 170);
     doc.roundedRect(M, y, W - 2 * M, tabH, 8, 8, 'F');
     doc.rect(M, y + tabH - 8, W - 2 * M, 8, 'F');
 
