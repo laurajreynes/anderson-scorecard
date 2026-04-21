@@ -47,29 +47,23 @@
 
   /* Header */
   .header {
-    padding: 18px 28px 12px;
+    padding: 12px 28px 10px;
     border-bottom: 1px solid var(--line);
   }
   .header .eyebrow {
-    font-size: 10px;
+    font-size: 9.5px;
     letter-spacing: 2.5px;
     text-transform: uppercase;
     color: var(--navy);
     font-weight: 800;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
   }
   .header h1 {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
     color: var(--ink);
     letter-spacing: -0.4px;
-    margin-bottom: 2px;
   }
-  .header .subtitle {
-    font-size: 12px;
-    color: var(--ink-2);
-  }
-  .header .subtitle strong { color: var(--navy); font-weight: 800; }
 
   .form-body { padding: 14px 28px 4px; }
 
@@ -151,11 +145,9 @@
     padding: 7px 10px 7px 12px;
     gap: 12px;
   }
-  .item-body .item-label {
-    font-size: 13px; color: var(--ink); font-weight: 600;
-  }
+  .item-body .item-label { display: none; }
   .item-body .item-hint {
-    display: block; font-size: 11px; color: var(--muted); font-weight: 400; margin-top: 1px;
+    display: block; font-size: 13px; color: var(--ink-2); font-weight: 500; margin-top: 0;
   }
   .check-btns { display: flex; gap: 5px; flex-shrink: 0; }
   .check-btn {
@@ -361,7 +353,6 @@
   <div class="header">
     <div class="eyebrow">Anderson Automotive Group</div>
     <h1>Inbound Sales Call Scorecard</h1>
-    <div class="subtitle">Mirrors the <strong>Phone Up Guide</strong> — score each step of the call</div>
   </div>
 
   <div class="form-body">
