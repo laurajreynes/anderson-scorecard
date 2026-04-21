@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anderson Call Scorecards</title>
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -62,7 +63,7 @@
   .tab-bar {
     display: flex;
     padding: 0 14px;
-    background: #fff;
+    background: #EEF1F5;
     border-bottom: 1px solid var(--line);
   }
   .tab-btn {
@@ -73,14 +74,21 @@
     border-bottom: 3px solid transparent;
     font-family: inherit;
     font-size: 12px;
-    font-weight: 800;
+    font-weight: 700;
     letter-spacing: 0.8px;
     text-transform: uppercase;
     cursor: pointer;
-    color: var(--muted);
-    transition: all 0.15s;
+    color: #A9B2BD;
+    opacity: 0.8;
+    transition: all 0.18s ease;
   }
-  .tab-btn:hover { color: var(--ink-2); }
+  .tab-btn:hover { color: #6B7A88; opacity: 1; }
+  .tab-btn.active {
+    background: #fff;
+    opacity: 1;
+    font-weight: 800;
+    border-bottom-width: 3px;
+  }
   .tab-btn[data-view="phone-up"].active { color: #5A87AA; border-bottom-color: #5A87AA; }
   .tab-btn[data-view="unsold"].active   { color: #567848; border-bottom-color: #7A9A6B; }
   .tab-btn[data-view="internet"].active { color: #325E54; border-bottom-color: #4E8B7D; }
@@ -92,6 +100,37 @@
   .header {
     padding: 12px 28px 10px;
     border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+  .header .header-text { min-width: 0; }
+  .header .guide-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 6px 10px;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent-3);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background 0.15s, transform 0.15s;
+    flex-shrink: 0;
+  }
+  .header .guide-link:hover {
+    background: var(--accent);
+    color: #fff;
+    transform: translateY(-1px);
+  }
+  .header .guide-link .pdf-icon {
+    font-size: 11px;
   }
   .header .eyebrow {
     font-size: 9.5px;
@@ -165,7 +204,7 @@
   .item-tab {
     width: 82px;
     min-width: 82px;
-    background: var(--accent);
+    background: #C3CBD4;
     color: #fff;
     display: flex; align-items: center; justify-content: center;
     padding: 6px 4px;
@@ -175,8 +214,9 @@
     text-transform: uppercase;
     text-align: center;
     line-height: 1.15;
+    transition: background 0.15s;
   }
-  .checklist li.active-yes .item-tab { background: var(--ok); }
+  .checklist li.active-yes .item-tab { background: var(--accent); }
   .checklist li.active-no  .item-tab { background: var(--bad); }
 
   .item-body {
@@ -197,7 +237,7 @@
     transition: all 0.15s; color: #BAC3CD;
   }
   .check-btn:hover { border-color: #9AAEC1; color: #6B7A88; }
-  .check-btn.yes.active { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .check-btn.yes.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .check-btn.no.active  { background: var(--bad); border-color: var(--bad); color: #fff; }
 
   .appt-card {
@@ -263,9 +303,9 @@
   .appt-choice .choice-label {
     font-size: 12px; font-weight: 800; color: var(--ink-2); letter-spacing: 0.8px; text-transform: uppercase;
   }
-  .appt-choice.yes.active { border-color: var(--ok); background: var(--ok-soft); }
-  .appt-choice.yes.active .big-mark { background: var(--ok); border-color: var(--ok); color: #fff; }
-  .appt-choice.yes.active .choice-label { color: var(--ok); }
+  .appt-choice.yes.active { border-color: var(--accent); background: var(--accent-soft); }
+  .appt-choice.yes.active .big-mark { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .appt-choice.yes.active .choice-label { color: var(--accent-3); }
   .appt-choice.no.active { border-color: var(--bad); background: var(--bad-soft); }
   .appt-choice.no.active .big-mark { background: var(--bad); border-color: var(--bad); color: #fff; }
   .appt-choice.no.active .choice-label { color: var(--bad); }
@@ -397,8 +437,13 @@
   <div class="view active view-phone-up" data-view="phone-up">
 
     <div class="header">
-      <div class="eyebrow">Anderson Automotive Group</div>
-      <h1>Inbound Sales Call Scorecard</h1>
+      <div class="header-text">
+        <div class="eyebrow">Anderson Automotive Group</div>
+        <h1>Inbound Sales Call Scorecard</h1>
+      </div>
+      <a class="guide-link" href="/guides/phone-up-guide.pdf" target="_blank" rel="noopener">
+        <span class="pdf-icon">&#128196;</span> View Call Guide
+      </a>
     </div>
 
     <div class="form-body">
@@ -576,8 +621,13 @@
   <div class="view view-unsold" data-view="unsold">
 
     <div class="header">
-      <div class="eyebrow">Anderson Automotive Group</div>
-      <h1>Unsold Showroom Follow-Up Scorecard</h1>
+      <div class="header-text">
+        <div class="eyebrow">Anderson Automotive Group</div>
+        <h1>Unsold Showroom Follow-Up Scorecard</h1>
+      </div>
+      <a class="guide-link" href="/guides/unsold-guide.pdf" target="_blank" rel="noopener">
+        <span class="pdf-icon">&#128196;</span> View Call Guide
+      </a>
     </div>
 
     <div class="form-body">
@@ -715,8 +765,13 @@
   <div class="view view-internet" data-view="internet">
 
     <div class="header">
-      <div class="eyebrow">Anderson Automotive Group</div>
-      <h1>Internet Call Scorecard (Outbound)</h1>
+      <div class="header-text">
+        <div class="eyebrow">Anderson Automotive Group</div>
+        <h1>Internet Call Scorecard (Outbound)</h1>
+      </div>
+      <a class="guide-link" href="/guides/internet-guide.pdf" target="_blank" rel="noopener">
+        <span class="pdf-icon">&#128196;</span> View Call Guide
+      </a>
     </div>
 
     <div class="form-body">
@@ -1005,6 +1060,8 @@
       askYesBody: 'Yes — appointment was requested.',
       askedPill: 'ASKED',
       filePrefix: 'Scorecard',
+      guideUrl: 'https://anderson-scorecard.vercel.app/guides/phone-up-guide.pdf',
+      guideLabel: 'Phone Up / Inbound Call Guide',
       tabLabelMap: {
         'Positive Greeting':       ['POSITIVE', 'GREETING'],
         'Create Flexibility':      ['CREATE', 'FLEXIBILITY'],
@@ -1035,6 +1092,8 @@
       askYesBody: 'Yes — the rep asked them to come in.',
       askedPill: 'ASKED',
       filePrefix: 'Unsold Follow-Up Scorecard',
+      guideUrl: 'https://anderson-scorecard.vercel.app/guides/unsold-guide.pdf',
+      guideLabel: 'Unsold Showroom Follow-Up Call Guide',
       tabLabelMap: {
         'Thank + Answer Questions': ['THANK +', 'ANSWER ?S'],
         'Isolate Objection':        ['ISOLATE', 'OBJECTION'],
@@ -1057,6 +1116,8 @@
       askYesBody: 'Yes — appointment was requested.',
       askedPill: 'ASKED',
       filePrefix: 'Internet Outbound Scorecard',
+      guideUrl: 'https://anderson-scorecard.vercel.app/guides/internet-guide.pdf',
+      guideLabel: 'Internet Outbound Call Guide',
       tabLabelMap: {
         'Positive Greeting (Outbound)':          ['POSITIVE', 'GREETING'],
         'Create Flexibility (Outbound)':         ['CREATE', 'FLEXIBILITY'],
@@ -1131,6 +1192,17 @@
       doc.setTextColor(31, 41, 55);
       doc.text('-', M, y + 14);
     }
+
+    if (cfg.guideUrl) {
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(138, 148, 160);
+      doc.text('CALL GUIDE', 316, y);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(AR, AG, AB);
+      doc.textWithLink('View the ' + (cfg.guideLabel || 'call guide'), 316, y + 14, { url: cfg.guideUrl });
+    }
     y += 30;
 
     const sectionTitle = (text) => {
@@ -1148,9 +1220,9 @@
       const rowH = 34;
       const tabW = 88;
 
-      if (item.status === 'YES')      doc.setFillColor(47, 133, 90);
+      if (item.status === 'YES')      doc.setFillColor(AR, AG, AB);
       else if (item.status === 'NO')  doc.setFillColor(210, 58, 58);
-      else                             doc.setFillColor(AR, AG, AB);
+      else                             doc.setFillColor(195, 203, 212);
       doc.rect(M, y, tabW, rowH, 'F');
 
       doc.setFillColor(252, 253, 254);
@@ -1182,7 +1254,7 @@
       const markerY = y + (rowH - boxSize) / 2;
 
       if (item.status === 'YES') {
-        doc.setFillColor(47, 133, 90);
+        doc.setFillColor(AR, AG, AB);
         doc.roundedRect(checkX, markerY, boxSize, boxSize, 3, 3, 'F');
         drawCheck(doc, checkX, markerY, boxSize);
       } else {
@@ -1237,7 +1309,7 @@
     doc.setFontSize(8);
     const pw = doc.getTextWidth(pillText) + 14;
     if (missed) { doc.setFillColor(210, 58, 58); doc.setDrawColor(210, 58, 58); }
-    else if (asked) { doc.setFillColor(47, 133, 90); doc.setDrawColor(47, 133, 90); }
+    else if (asked) { doc.setFillColor(AR, AG, AB); doc.setDrawColor(AR, AG, AB); }
     else { doc.setFillColor(200, 208, 216); doc.setDrawColor(200, 208, 216); }
     doc.roundedRect(W - M - 10 - pw, y + 8, pw, 13, 6, 6, 'F');
     doc.setTextColor(255, 255, 255);
@@ -1266,7 +1338,7 @@
       const cSize = 36;
       const cBoxX = bodyX + 4;
       const cBoxY = y + (askBoxH - cSize) / 2;
-      doc.setDrawColor(47, 133, 90);
+      doc.setDrawColor(AR, AG, AB);
       doc.setLineWidth(cSize * 0.16);
       doc.line(cBoxX + cSize * 0.06, cBoxY + cSize * 0.55, cBoxX + cSize * 0.40, cBoxY + cSize * 0.85);
       doc.line(cBoxX + cSize * 0.40, cBoxY + cSize * 0.85, cBoxX + cSize * 0.95, cBoxY + cSize * 0.15);
@@ -1277,7 +1349,7 @@
       doc.text(cfg.askHeading, bodyX + cSize + 20, y + 36);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
-      doc.setTextColor(47, 133, 90);
+      doc.setTextColor(DR, DG, DB);
       doc.text(cfg.askYesBody, bodyX + cSize + 20, y + 54);
     } else {
       doc.setFont('helvetica', 'bold');
