@@ -204,7 +204,7 @@
   .item-tab {
     width: 82px;
     min-width: 82px;
-    background: var(--accent);
+    background: #C3CBD4;
     color: #fff;
     display: flex; align-items: center; justify-content: center;
     padding: 6px 4px;
@@ -214,8 +214,9 @@
     text-transform: uppercase;
     text-align: center;
     line-height: 1.15;
+    transition: background 0.15s;
   }
-  .checklist li.active-yes .item-tab { background: var(--ok); }
+  .checklist li.active-yes .item-tab { background: var(--accent); }
   .checklist li.active-no  .item-tab { background: var(--bad); }
 
   .item-body {
@@ -236,7 +237,7 @@
     transition: all 0.15s; color: #BAC3CD;
   }
   .check-btn:hover { border-color: #9AAEC1; color: #6B7A88; }
-  .check-btn.yes.active { background: var(--ok); border-color: var(--ok); color: #fff; }
+  .check-btn.yes.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .check-btn.no.active  { background: var(--bad); border-color: var(--bad); color: #fff; }
 
   .appt-card {
@@ -302,9 +303,9 @@
   .appt-choice .choice-label {
     font-size: 12px; font-weight: 800; color: var(--ink-2); letter-spacing: 0.8px; text-transform: uppercase;
   }
-  .appt-choice.yes.active { border-color: var(--ok); background: var(--ok-soft); }
-  .appt-choice.yes.active .big-mark { background: var(--ok); border-color: var(--ok); color: #fff; }
-  .appt-choice.yes.active .choice-label { color: var(--ok); }
+  .appt-choice.yes.active { border-color: var(--accent); background: var(--accent-soft); }
+  .appt-choice.yes.active .big-mark { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .appt-choice.yes.active .choice-label { color: var(--accent-3); }
   .appt-choice.no.active { border-color: var(--bad); background: var(--bad-soft); }
   .appt-choice.no.active .big-mark { background: var(--bad); border-color: var(--bad); color: #fff; }
   .appt-choice.no.active .choice-label { color: var(--bad); }
@@ -1219,9 +1220,9 @@
       const rowH = 34;
       const tabW = 88;
 
-      if (item.status === 'YES')      doc.setFillColor(47, 133, 90);
+      if (item.status === 'YES')      doc.setFillColor(AR, AG, AB);
       else if (item.status === 'NO')  doc.setFillColor(210, 58, 58);
-      else                             doc.setFillColor(AR, AG, AB);
+      else                             doc.setFillColor(195, 203, 212);
       doc.rect(M, y, tabW, rowH, 'F');
 
       doc.setFillColor(252, 253, 254);
@@ -1253,7 +1254,7 @@
       const markerY = y + (rowH - boxSize) / 2;
 
       if (item.status === 'YES') {
-        doc.setFillColor(47, 133, 90);
+        doc.setFillColor(AR, AG, AB);
         doc.roundedRect(checkX, markerY, boxSize, boxSize, 3, 3, 'F');
         drawCheck(doc, checkX, markerY, boxSize);
       } else {
@@ -1308,7 +1309,7 @@
     doc.setFontSize(8);
     const pw = doc.getTextWidth(pillText) + 14;
     if (missed) { doc.setFillColor(210, 58, 58); doc.setDrawColor(210, 58, 58); }
-    else if (asked) { doc.setFillColor(47, 133, 90); doc.setDrawColor(47, 133, 90); }
+    else if (asked) { doc.setFillColor(AR, AG, AB); doc.setDrawColor(AR, AG, AB); }
     else { doc.setFillColor(200, 208, 216); doc.setDrawColor(200, 208, 216); }
     doc.roundedRect(W - M - 10 - pw, y + 8, pw, 13, 6, 6, 'F');
     doc.setTextColor(255, 255, 255);
@@ -1337,7 +1338,7 @@
       const cSize = 36;
       const cBoxX = bodyX + 4;
       const cBoxY = y + (askBoxH - cSize) / 2;
-      doc.setDrawColor(47, 133, 90);
+      doc.setDrawColor(AR, AG, AB);
       doc.setLineWidth(cSize * 0.16);
       doc.line(cBoxX + cSize * 0.06, cBoxY + cSize * 0.55, cBoxX + cSize * 0.40, cBoxY + cSize * 0.85);
       doc.line(cBoxX + cSize * 0.40, cBoxY + cSize * 0.85, cBoxX + cSize * 0.95, cBoxY + cSize * 0.15);
@@ -1348,7 +1349,7 @@
       doc.text(cfg.askHeading, bodyX + cSize + 20, y + 36);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(12);
-      doc.setTextColor(47, 133, 90);
+      doc.setTextColor(DR, DG, DB);
       doc.text(cfg.askYesBody, bodyX + cSize + 20, y + 54);
     } else {
       doc.setFont('helvetica', 'bold');
